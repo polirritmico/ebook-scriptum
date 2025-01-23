@@ -32,10 +32,10 @@ def test_translate_full_ebook(tmp_dir, file_loader) -> None:
     scriptum = Scriptorium()
     scriptum.set_importer(importer)
     scriptum.set_transmuters(translator)
-    scriptum.set_options(case)
-    scriptum.load_data()
-    scriptum.generate_document()
-    scriptum.transmute()
+    scriptum.set_options(case)  # After this the system behaviour is fully setted
+    scriptum.load_data()  # The ImporterHandler gets the data from the source
+    scriptum.generate_document()  # The ImporterHandler generates a Document instance
+    scriptum.transmute()  # The TransmuterHandler receives the Document and perform the Transmutation
     scriptum.validate_output()
     output = scriptum.export()
 

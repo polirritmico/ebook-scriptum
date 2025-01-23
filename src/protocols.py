@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 
 from enum import Enum
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
+
+from src.document import Document
 
 
 class TransmuterHandler(Protocol):
-    pass
+    def transmute(self, document: Document) -> None: ...
 
 
 class ImporterHandler(Protocol):
-    pass
+    def load_data(self, source: str) -> None: ...
+
+    def generate_document(self) -> Document: ...
 
 
 class ModelType(Enum):
@@ -20,4 +24,9 @@ class ModelType(Enum):
 
 @runtime_checkable
 class ModelHandler(Protocol):
-    pass
+    model_type: ModelType
+    id: str
+
+    def response_validator(self, response, request) -> bool: ...
+
+    def make_instructions(self, content) -> Any: ...
