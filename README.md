@@ -24,3 +24,13 @@ Instructions
 Instructions
 
 ## Configuration
+
+Instructions
+
+---
+
+## Design
+
+### Diagram
+
+[Diagram](./docs.svg) <img src="./docs/design.svg">
