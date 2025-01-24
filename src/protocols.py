@@ -12,9 +12,8 @@ class TransmuterHandler(Protocol):
 
 
 class ImporterHandler(Protocol):
-    def load_data(self, source: str) -> None: ...
-
     def generate_document(self) -> Document: ...
+    def load_data(self, source: str) -> None: ...
 
 
 class ModelType(Enum):
@@ -28,5 +27,4 @@ class ModelHandler(Protocol):
     id: str
 
     def response_validator(self, response, request) -> bool: ...
-
     def make_instructions(self, content) -> Any: ...
