@@ -35,23 +35,25 @@ def test_extract_epub(clean_fs) -> None:
         assert file.name in expected_files
 
 
-# def test_get_chapter_paths(clean_fs) -> None:
-#     case = os.path.normpath("tests/files/simple_ebook.epub")
-#     expected_paths = [
-#         "tests/files/out/OEBPS/Text/Section0001.xhtml",
-#         "tests/files/out/OEBPS/Text/TOC.xhtml",
-#         "tests/files/out/OEBPS/Text/cubierta.xhtml",
-#     ]
-#
-#     epub = Epub(case)
-#     epub.extract(test_fs)
-#     output = epub.collect_section_files()
-#
-#     assert output
-#     for i, file in enumerate(expected_paths):
-#         assert expected_paths[i] == output[i]
-#
-#
+def test_collect_section_files(clean_fs) -> None:
+    case = Path("tests/files/simple_ebook.epub")
+    expected_paths = [
+        Path("tests/files/out/OEBPS/Text/Section0001.xhtml"),
+        Path("tests/files/out/OEBPS/Text/TOC.xhtml"),
+        Path("tests/files/out/OEBPS/Text/cubierta.xhtml"),
+        Path("tests/files/out/OEBPS/content.opf"),
+        Path("tests/files/out/OEBPS/toc.ncx"),
+    ]
+
+    epub = EpubImporter()
+    epub.extract(case, test_fs)
+    output = epub.collect_section_files(test_fs)
+
+    assert output
+    for expected in expected_paths:
+        assert expected in output
+
+
 # def test_get_section_titles(clean_fs) -> None:
 #     case = os.path.normpath("tests/files/simple_ebook.epub")
 #     expected = {
