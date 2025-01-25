@@ -21,6 +21,25 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
+def test_collect_files_data(clean_fs) -> None:
+    case_file = Path("tests/files/simple_ebook.epub")
+    expected_file = Path(test_fs) / "OEBPS" / "Text" / "Section0001.xhtml"
+    expected_str = "<p><i>Italic paragraph.</i></p>"
+
+    epub = EpubImporter()
+    epub.extract_epub(case_file, test_fs)
+    epub.collect_text_and_metadata_files(test_fs)
+    epub.collect_files_data()
+
+    assert epub.text_files_content
+    assert epub.metadata_files_content
+
+    output = epub.text_files_content[expected_file]
+
+    assert output
+    assert expected_str in output
+
+
 def test_extract_epub(clean_fs) -> None:
     case = Path("tests/files/simple_ebook.epub")
     expected_chapters_path = Path(test_fs) / "OEBPS" / "Text"
