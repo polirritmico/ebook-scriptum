@@ -28,7 +28,6 @@ class EpubImporter:
             self.collect_files_data()
 
     def generate_document(self) -> Document:
-        # TODO: Not called
         document = Document()
         metadata = self.parse_document_metadata()
         sections = self.parse_sections(metadata)
@@ -37,7 +36,7 @@ class EpubImporter:
         document.set_sections(sections)
         return document
 
-    def parse_sections(self, metadata: dict) -> dict[str, SectionMetadata]:
+    def parse_sections(self, metadata: DocumentMetadata) -> dict[str, SectionMetadata]:
         sections = {}
         ordered_sections = self.get_sections_in_order(metadata)
         for order, filepath in enumerate(ordered_sections):
@@ -62,12 +61,11 @@ class EpubImporter:
         self.parsed_sections = sections
         return sections
 
-    def get_section_lang(self, content) -> str:
-        # TODO: if not defined use the metadata. If not defined use default?
+    def get_section_lang(self, content: BeautifulSoup) -> str:
         lang = content.html.get("xml:lang")
         return lang
 
-    def get_section_title(self, content) -> str:
+    def get_section_title(self, content: BeautifulSoup) -> str:
         title = content.get("title")
         if not title:
             title_tag = content.find("title")

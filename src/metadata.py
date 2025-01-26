@@ -4,10 +4,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from bs4 import BeautifulSoup, Tag
+
 
 @dataclass
 class SectionMetadata:
-    content: any  # TODO: Beautiful Soup
+    content: BeautifulSoup
     filepath: Path
     lang: str
     order: int
@@ -16,9 +18,9 @@ class SectionMetadata:
 
 @dataclass
 class DocumentMetadata:
-    creator: any  # TODO: Beautiful Soup
-    description: str  # TODO: bs4 tag
+    creator: str
+    description: str
     lang: str
     title: str
-    manifest: str
-    spine: any  # TODO: bs4 tag
+    manifest: Tag
+    spine: Tag

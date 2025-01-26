@@ -8,15 +8,6 @@ from typing import Any, Protocol, runtime_checkable
 from src.document import Document
 
 
-class TransmuterHandler(Protocol):
-    def transmute(self, document: Document) -> None: ...
-
-
-class ImporterHandler(Protocol):
-    def generate_document(self) -> Document: ...
-    def load_data(self, source: str) -> None: ...
-
-
 class ModelType(Enum):
     OLLAMA = 1
     TTS = 2
@@ -29,3 +20,12 @@ class ModelHandler(Protocol):
 
     def response_validator(self, response, request) -> bool: ...
     def make_instructions(self, content) -> Any: ...
+
+
+class TransmuterHandler(Protocol):
+    def transmute(self, document: Document) -> None: ...
+
+
+class ImporterHandler(Protocol):
+    def generate_document(self) -> Document: ...
+    def load_data(self, source: Path) -> None: ...
