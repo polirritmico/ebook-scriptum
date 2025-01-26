@@ -45,7 +45,9 @@ class EpubImporter:
 
             extension = filepath.suffix[1:]
             if extension == "xhtml":
-                extension = "xml"
+                extension = "lxml-xml"
+            elif extension == "html":
+                extension = "lxml"
             content = BeautifulSoup(raw_data, extension)
 
             section_metadata = SectionMetadata(
