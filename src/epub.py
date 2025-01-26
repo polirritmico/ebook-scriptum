@@ -14,7 +14,7 @@ from src.document import Document
 class EpubImporter:
     def __init__(self):
         self.text_files = None
-        self.metadata_files = None
+        self.metadata_file = None
         self.text_files_content = None
         self.metadata_files_content = None
 
@@ -23,11 +23,30 @@ class EpubImporter:
         with TemporaryDirectory(suffix="scriptum_") as tmpdir:
             tmp_path = Path(tmpdir)
             self.extract_epub(source, tmp_path)
-            self.collect_text_and_metadata_files(tmp_path)
+            self.collect_metadata_and_text_files(tmp_path)
             self.collect_files_data()
 
+    def generate_document(self) -> Document:
+        # TODO: Not called
+        document = Document()
+        metadata = self.parse_metadata()
+        sections = self.parse_sections()
+
+        document.set_medatada(**metadata)
+        document.set_sections(sections)
+        return document
+
+    def parse_metadata(self, metadata: dict[Path, str] = None) -> None:
+        if metadata is None:
+            assert self.metadata_file is not None
+            metadata = self.metadata_file
+
+    def parse_sections(self) -> dict[str, BeautifulSoup]:
+        # TODO: implement: Create each section soup
+        pass
+
     def collect_files_data(self) -> None:
-        if self.metadata_files is None or self.text_files is None:
+        if self.metadata_file is None or self.text_files is None:
             raise ValueError("Not collected files. Try load_data() first.")
 
         self.text_files_content = {}
@@ -36,30 +55,24 @@ class EpubImporter:
                 raw_data = stream.read()
                 self.text_files_content[file] = raw_data
 
-        self.metadata_files_content = {}
-        for file in self.text_files:
-            with open(file, "r", encoding="utf-8") as stream:
-                raw_data = stream.read()
-                self.metadata_files_content[file] = raw_data
+        with open(self.metadata_file, "r", encoding="utf-8") as stream:
+            raw_data = stream.read()
+            self.metadata_file_content = raw_data
 
-    def generate_document(self) -> Document:
-        # TODO: Not called
-        document = Document()
-        metadata = self.generate_metadata()
-        sections = self.generate_sections()
+    def collect_metadata_and_text_files(self, path: Path) -> (list[str], list[str]):
+        text, metadata = [], []
+        metadata_file = "content.opf"
+        text_suffixes = {".xhtml", ".html"}
 
-        document.set_medatada(**metadata)
-        document.set_sections(sections)
-        return document
+        for entry in path.rglob("*"):
+            if entry.name == metadata_file:
+                metadata = entry
+            elif entry.suffix in text_suffixes:
+                text.append(entry)
 
-    def generate_metadata(self, metadata: list[str] = None) -> None:
-        # TODO: implement: From the soups, extract the data
-        if metadata is None:
-            metadata = self.metadata_files
-
-    def generate_sections(self) -> dict[str, BeautifulSoup]:
-        # TODO: implement: Create each section soup
-        pass
+        self.text_files = text
+        self.metadata_file = metadata
+        return text, metadata
 
     def extract_epub(self, source: Path, target_path: Path) -> None:
         if any(element.is_dir() for element in target_path.iterdir()):
@@ -68,18 +81,3 @@ class EpubImporter:
         self.temp_path = target_path
         with ZipFile(source, "r") as stream:
             stream.extractall(target_path)
-
-    def collect_text_and_metadata_files(self, path: Path) -> (list[str], list[str]):
-        text, metadata = [], []
-        metadata_suffixes = {".opf", ".ncx"}
-        text_suffixes = {".xhtml", ".html"}
-
-        for entry in path.rglob("*"):
-            if entry.suffix in metadata_suffixes:
-                metadata.append(entry)
-            elif entry.suffix in text_suffixes:
-                text.append(entry)
-
-        self.text_files = text
-        self.metadata_files = metadata
-        return text, metadata

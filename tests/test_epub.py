@@ -25,19 +25,19 @@ def test_collect_files_data(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_file = Path(test_fs) / "OEBPS" / "Text" / "Section0001.xhtml"
     expected_str = "<p><i>Italic paragraph.</i></p>"
+    expected_metadata = "<dc:title>Título</dc:title>"
 
     epub = EpubImporter()
     epub.extract_epub(case_file, test_fs)
-    epub.collect_text_and_metadata_files(test_fs)
+    epub.collect_metadata_and_text_files(test_fs)
     epub.collect_files_data()
 
     assert epub.text_files_content
-    assert epub.metadata_files_content
+    assert epub.metadata_file_content
 
-    output = epub.text_files_content[expected_file]
-
-    assert output
-    assert expected_str in output
+    assert epub.text_files_content[expected_file]
+    assert expected_str in epub.text_files_content[expected_file]
+    assert expected_metadata in epub.metadata_file_content
 
 
 def test_extract_epub(clean_fs) -> None:
@@ -61,21 +61,15 @@ def test_collect_text_and_metadata_files(clean_fs) -> None:
         "tests/files/out/OEBPS/Text/TOC.xhtml",
         "tests/files/out/OEBPS/Text/cubierta.xhtml",
     ]
-    expected_metadata_paths = [
-        "tests/files/out/OEBPS/content.opf",
-        "tests/files/out/OEBPS/toc.ncx",
-    ]
 
     epub = EpubImporter()
     epub.extract_epub(case, test_fs)
-    out_text, out_meta = epub.collect_text_and_metadata_files(test_fs)
+    output_text, output_meta = epub.collect_metadata_and_text_files(test_fs)
 
-    assert len(out_text) == 3
-    assert len(out_meta) == 2
+    assert output_meta
+    assert len(output_text) == 3
     for expected in expected_text_paths:
-        assert Path(expected) in out_text
-    for expected in expected_metadata_paths:
-        assert Path(expected) in out_meta
+        assert Path(expected) in output_text
 
 
 # def test_get_section_titles(clean_fs) -> None:
