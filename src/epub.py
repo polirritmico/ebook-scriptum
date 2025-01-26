@@ -30,15 +30,52 @@ class EpubImporter:
         # TODO: Not called
         document = Document()
         metadata = self.parse_metadata()
-        sections = self.parse_sections()
+        sections = self.parse_sections(metadata)
 
         document.set_medatada(**metadata)
         document.set_sections(sections)
         return document
 
-    def parse_sections(self) -> dict[str, BeautifulSoup]:
-        # TODO: implement: Create each section soup
-        pass
+    def parse_sections(self, metadata) -> dict:
+        sections = {}
+        ordered_sections = self.get_sections_in_order(metadata)
+        for order, filepath in enumerate(ordered_sections):
+            raw_data = self.text_files_content[filepath]
+            content = BeautifulSoup(raw_data, "html")
+            section = {
+                "content": content,
+                "filepath": filepath,
+                "lang": self.get_section_lang(content),
+                "order": order,
+                "title": self.get_section_title(content),
+            }
+            sections[filepath.name] = section
+
+    def get_section_lang(self, content) -> str:
+        # TODO: if not defined use the metadata. If not defined use default?
+        lang = content.html.get("xml:lang")
+        return lang
+
+    def get_section_title(self, content) -> str:
+        title = content.get("title")
+        if title is None:
+            try:
+                title = content.html.body.find("h1").text
+            except Exception:
+                title = "NONE"
+        return title
+
+    def get_sections_in_order(self, metadata) -> list[str]:
+        ordered_sections = []
+        spine = metadata["spine"].find_all("itemref")
+        for section in spine:
+            id = section.get("idref")
+            for file in self.text_files:
+                if file.name == id:
+                    ordered_sections.append(file)
+                    break
+
+        return ordered_sections
 
     def parse_metadata(self) -> dict:
         if self.metadata_file_content is None:
@@ -56,6 +93,9 @@ class EpubImporter:
             if value is not None and hasattr(value, "text"):
                 metadata[name] = value.text
 
+        metadata["manifest"] = soup.find("manifest")
+        metadata["spine"] = soup.find("spine")
+
         return metadata
 
     def collect_files_data(self) -> None:
@@ -72,7 +112,7 @@ class EpubImporter:
             raw_data = stream.read()
             self.metadata_file_content = raw_data
 
-    def collect_metadata_and_text_files(self, path: Path) -> (list[str], list[str]):
+    def collect_metadata_and_text_files(self, path: Path) -> (list[str], str):
         text, metadata = [], []
         metadata_file = "content.opf"
         text_suffixes = {".xhtml", ".html"}
