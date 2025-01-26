@@ -34,16 +34,16 @@ def test_parse_sections(clean_fs) -> None:
     epub.collect_metadata_and_text_files(test_fs)
     epub.collect_files_data()
 
-    metadata = epub.parse_metadata()
+    metadata = epub.parse_document_metadata()
     assert metadata is not None
     epub.parse_sections(metadata)
     assert expected_sections_count == len(epub.parsed_sections)
     output = epub.parsed_sections[expected_section]
 
     assert output
-    assert expected_title == output.get("title")
-    assert expected_lang == output.get("lang")
-    assert expected_order == output.get("order")
+    assert expected_title == output.title
+    assert expected_lang == output.lang
+    assert expected_order == output.order
 
 
 def test_parse_section_title(clean_fs) -> None:
@@ -58,15 +58,15 @@ def test_parse_section_title(clean_fs) -> None:
     epub.collect_metadata_and_text_files(test_fs)
     epub.collect_files_data()
 
-    metadata = epub.parse_metadata()
+    metadata = epub.parse_document_metadata()
     assert metadata is not None
     epub.parse_sections(metadata)
     output = epub.parsed_sections[expected_section]
 
     assert output
-    assert expected_title == output.get("title")
-    assert expected_lang == output.get("lang")
-    assert expected_order == output.get("order")
+    assert expected_title == output.title
+    assert expected_lang == output.lang
+    assert expected_order == output.order
 
 
 def test_get_sections_in_order(clean_fs) -> None:
@@ -81,7 +81,7 @@ def test_get_sections_in_order(clean_fs) -> None:
     epub.extract_epub(case_file, test_fs)
     epub.collect_metadata_and_text_files(test_fs)
     epub.collect_files_data()
-    metadata = epub.parse_metadata()
+    metadata = epub.parse_document_metadata()
     output_order = epub.get_sections_in_order(metadata)
 
     for expected, output in zip(expected_order, output_order):
@@ -98,11 +98,11 @@ def test_parse_metadata(clean_fs) -> None:
     epub.extract_epub(case_file, test_fs)
     epub.collect_metadata_and_text_files(test_fs)
     epub.collect_files_data()
-    output = epub.parse_metadata()
+    output = epub.parse_document_metadata()
 
-    assert expected_title == output["title"]
-    assert expected_language == output["lang"]
-    assert expected_creator == output["creator"]
+    assert expected_title == output.title
+    assert expected_language == output.lang
+    assert expected_creator == output.creator
 
 
 def test_collect_files_data(clean_fs) -> None:
