@@ -23,15 +23,27 @@ def clean_fs() -> None:
 
 def test_parse_sections(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
+    expected_section = "Section0001.xhtml"
+    expected_sections_count = 3
+    expected_title = "Chapter 1"
+    expected_lang = "es"
+    expected_order = 2  # 0-index
 
     epub = EpubImporter()
     epub.extract_epub(case_file, test_fs)
     epub.collect_metadata_and_text_files(test_fs)
     epub.collect_files_data()
+
     metadata = epub.parse_metadata()
     assert metadata is not None
-
     epub.parse_sections(metadata)
+    assert expected_sections_count == len(epub.parsed_sections)
+    output = epub.parsed_sections[expected_section]
+
+    assert output
+    assert expected_title == output.get("title")
+    assert expected_lang == output.get("lang")
+    assert expected_order == output.get("order")
 
 
 def test_get_sections_in_order(clean_fs) -> None:
