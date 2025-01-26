@@ -16,7 +16,7 @@ class EpubImporter:
         self.text_files = None
         self.metadata_file = None
         self.text_files_content = None
-        self.metadata_files_content = None
+        self.metadata_file_content = None
 
     def load_data(self, source: Path) -> None:
         self.source_data = {}
@@ -36,14 +36,27 @@ class EpubImporter:
         document.set_sections(sections)
         return document
 
-    def parse_metadata(self, metadata: dict[Path, str] = None) -> None:
-        if metadata is None:
-            assert self.metadata_file is not None
-            metadata = self.metadata_file
-
     def parse_sections(self) -> dict[str, BeautifulSoup]:
         # TODO: implement: Create each section soup
         pass
+
+    def parse_metadata(self) -> dict:
+        if self.metadata_file_content is None:
+            raise ValueError("No metadata_file_content. Try collect_files_data() first")
+
+        soup = BeautifulSoup(self.metadata_file_content, "xml")
+        metadata = {
+            "creator": soup.find("dc:creator"),
+            "description": soup.find("dc:description"),
+            "lang": soup.find("dc:language"),
+            "title": soup.find("dc:title"),
+        }
+
+        for name, value in metadata.items():
+            if value is not None and hasattr(value, "text"):
+                metadata[name] = value.text
+
+        return metadata
 
     def collect_files_data(self) -> None:
         if self.metadata_file is None or self.text_files is None:

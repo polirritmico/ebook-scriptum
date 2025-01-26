@@ -21,6 +21,23 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
+def test_parse_metadata(clean_fs) -> None:
+    case_file = Path("tests/files/simple_ebook.epub")
+    expected_title = "Título"
+    expected_language = "es"
+    expected_creator = "Nombres Apellidos"
+
+    epub = EpubImporter()
+    epub.extract_epub(case_file, test_fs)
+    epub.collect_metadata_and_text_files(test_fs)
+    epub.collect_files_data()
+    output = epub.parse_metadata()
+
+    assert expected_title == output["title"]
+    assert expected_language == output["lang"]
+    assert expected_creator == output["creator"]
+
+
 def test_collect_files_data(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_file = Path(test_fs) / "OEBPS" / "Text" / "Section0001.xhtml"
