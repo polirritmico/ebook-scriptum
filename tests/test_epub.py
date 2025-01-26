@@ -46,6 +46,29 @@ def test_parse_sections(clean_fs) -> None:
     assert expected_order == output.get("order")
 
 
+def test_parse_section_title(clean_fs) -> None:
+    case_file = Path("tests/files/simple_ebook.epub")
+    expected_section = "cubierta.xhtml"
+    expected_title = "Cubierta"
+    expected_lang = "es"
+    expected_order = 0
+
+    epub = EpubImporter()
+    epub.extract_epub(case_file, test_fs)
+    epub.collect_metadata_and_text_files(test_fs)
+    epub.collect_files_data()
+
+    metadata = epub.parse_metadata()
+    assert metadata is not None
+    epub.parse_sections(metadata)
+    output = epub.parsed_sections[expected_section]
+
+    assert output
+    assert expected_title == output.get("title")
+    assert expected_lang == output.get("lang")
+    assert expected_order == output.get("order")
+
+
 def test_get_sections_in_order(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_order = [
@@ -131,23 +154,3 @@ def test_collect_text_and_metadata_files(clean_fs) -> None:
     assert len(output_text) == 3
     for expected in expected_text_paths:
         assert Path(expected) in output_text
-
-
-# def test_get_section_titles(clean_fs) -> None:
-#     case = os.path.normpath("tests/files/simple_ebook.epub")
-#     expected = {
-#         "Text/cubierta.xhtml": "Cubierta",
-#         "Text/Section0001.xhtml": "Chapter 1",
-#     }
-#     expected_path = "tests/files/out/OEBPS/toc.ncx"
-#
-#     epub = Epub(case)
-#     epub.extract(test_fs)
-#     assert os.path.exists(expected_path)
-#
-#     epub.collect_section_files()
-#     output = epub.extract_section_title()
-#
-#     for exp, out in zip(expected.items(), output.items()):
-#         assert exp[0] == out[0]
-#         assert exp[1] == out[1]
