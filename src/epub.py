@@ -21,7 +21,7 @@ class EpubImporter:
 
     def load_data(self, source: Path) -> None:
         self.source_data = {}
-        with TemporaryDirectory(suffix="scriptum_") as tmpdir:
+        with TemporaryDirectory(prefix="scriptum_") as tmpdir:
             tmp_path = Path(tmpdir)
             self.extract_epub(source, tmp_path)
             self.collect_metadata_and_text_files(tmp_path)
