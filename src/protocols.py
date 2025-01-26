@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from enum import Enum
+from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 from src.document import Document

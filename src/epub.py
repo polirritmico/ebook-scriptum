@@ -9,6 +9,7 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 from bs4 import BeautifulSoup
 
 from src.document import Document
+from src.metadata import DocumentMetadata, SectionMetadata
 
 
 class EpubImporter:
@@ -29,14 +30,14 @@ class EpubImporter:
     def generate_document(self) -> Document:
         # TODO: Not called
         document = Document()
-        metadata = self.parse_metadata()
+        metadata = self.parse_document_metadata()
         sections = self.parse_sections(metadata)
 
-        document.set_medatada(**metadata)
+        document.set_medatada(metadata)
         document.set_sections(sections)
         return document
 
-    def parse_sections(self, metadata) -> dict:
+    def parse_sections(self, metadata: dict) -> dict[str, SectionMetadata]:
         sections = {}
         ordered_sections = self.get_sections_in_order(metadata)
         for order, filepath in enumerate(ordered_sections):
@@ -47,14 +48,14 @@ class EpubImporter:
                 extension = "xml"
             content = BeautifulSoup(raw_data, extension)
 
-            section = {
-                "content": content,
-                "filepath": filepath,
-                "lang": self.get_section_lang(content),
-                "order": order,
-                "title": self.get_section_title(content),
-            }
-            sections[filepath.name] = section
+            section_metadata = SectionMetadata(
+                content=content,
+                filepath=filepath,
+                lang=self.get_section_lang(content),
+                order=order,
+                title=self.get_section_title(content),
+            )
+            sections[filepath.name] = section_metadata
 
         self.parsed_sections = sections
         return sections
@@ -76,9 +77,9 @@ class EpubImporter:
                 title = "NONE"
         return title
 
-    def get_sections_in_order(self, metadata) -> list[str]:
+    def get_sections_in_order(self, metadata: DocumentMetadata) -> list[str]:
         ordered_sections = []
-        spine = metadata["spine"].find_all("itemref")
+        spine = metadata.spine.find_all("itemref")
         for section in spine:
             id = section.get("idref")
             for file in self.text_files:
@@ -88,26 +89,26 @@ class EpubImporter:
 
         return ordered_sections
 
-    def parse_metadata(self) -> dict:
+    def parse_document_metadata(self) -> DocumentMetadata:
         if self.metadata_file_content is None:
             raise ValueError("No metadata_file_content. Try collect_files_data() first")
 
         soup = BeautifulSoup(self.metadata_file_content, "xml")
-        metadata = {
-            "creator": soup.find("dc:creator"),
-            "description": soup.find("dc:description"),
-            "lang": soup.find("dc:language"),
-            "title": soup.find("dc:title"),
-        }
-
-        for name, value in metadata.items():
-            if value is not None and hasattr(value, "text"):
-                metadata[name] = value.text
-
-        metadata["manifest"] = soup.find("manifest")
-        metadata["spine"] = soup.find("spine")
+        metadata = DocumentMetadata(
+            creator=self.get_text_from_soup_tag("dc:creator", soup),
+            description=self.get_text_from_soup_tag("dc:description", soup),
+            lang=self.get_text_from_soup_tag("dc:language", soup),
+            title=self.get_text_from_soup_tag("dc:title", soup),
+            manifest=soup.find("manifest"),
+            spine=soup.find("spine"),
+        )
 
         return metadata
+
+    def get_text_from_soup_tag(self, tag: str, soup: BeautifulSoup) -> str | None:
+        tag_element = soup.find(tag)
+        if tag_element and hasattr(tag_element, "text"):
+            return tag_element.get_text()
 
     def collect_files_data(self) -> None:
         if self.metadata_file is None or self.text_files is None:
