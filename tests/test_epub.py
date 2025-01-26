@@ -21,6 +21,38 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
+def test_parse_sections(clean_fs) -> None:
+    case_file = Path("tests/files/simple_ebook.epub")
+
+    epub = EpubImporter()
+    epub.extract_epub(case_file, test_fs)
+    epub.collect_metadata_and_text_files(test_fs)
+    epub.collect_files_data()
+    metadata = epub.parse_metadata()
+    assert metadata is not None
+
+    epub.parse_sections(metadata)
+
+
+def test_get_sections_in_order(clean_fs) -> None:
+    case_file = Path("tests/files/simple_ebook.epub")
+    expected_order = [
+        "tests/files/out/OEBPS/Text/cubierta.xhtml",
+        "tests/files/out/OEBPS/Text/TOC.xhtml",
+        "tests/files/out/OEBPS/Text/Section0001.xhtml",
+    ]
+
+    epub = EpubImporter()
+    epub.extract_epub(case_file, test_fs)
+    epub.collect_metadata_and_text_files(test_fs)
+    epub.collect_files_data()
+    metadata = epub.parse_metadata()
+    output_order = epub.get_sections_in_order(metadata)
+
+    for expected, output in zip(expected_order, output_order):
+        assert Path(expected) == output
+
+
 def test_parse_metadata(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_title = "Título"
