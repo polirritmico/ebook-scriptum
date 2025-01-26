@@ -41,7 +41,12 @@ class EpubImporter:
         ordered_sections = self.get_sections_in_order(metadata)
         for order, filepath in enumerate(ordered_sections):
             raw_data = self.text_files_content[filepath]
-            content = BeautifulSoup(raw_data, "html")
+
+            extension = filepath.suffix[1:]
+            if extension == "xhtml":
+                extension = "xml"
+            content = BeautifulSoup(raw_data, extension)
+
             section = {
                 "content": content,
                 "filepath": filepath,
@@ -50,6 +55,9 @@ class EpubImporter:
                 "title": self.get_section_title(content),
             }
             sections[filepath.name] = section
+
+        self.parsed_sections = sections
+        return sections
 
     def get_section_lang(self, content) -> str:
         # TODO: if not defined use the metadata. If not defined use default?
