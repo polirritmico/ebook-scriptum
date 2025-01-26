@@ -66,9 +66,12 @@ class EpubImporter:
 
     def get_section_title(self, content) -> str:
         title = content.get("title")
-        if title is None:
+        if not title:
+            title_tag = content.find("title")
+            title = title_tag.get_text() if title_tag else title
+        if not title:
             try:
-                title = content.html.body.find("h1").text
+                title = content.html.body.find("h1").get_text()
             except Exception:
                 title = "NONE"
         return title
