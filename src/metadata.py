@@ -22,5 +22,4 @@ class DocumentMetadata:
     description: str
     lang: str
     title: str
-    manifest: Tag
-    spine: Tag
+    spine: list[Path] = None

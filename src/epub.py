@@ -38,8 +38,7 @@ class EpubImporter:
 
     def parse_sections(self, metadata: DocumentMetadata) -> dict[str, SectionMetadata]:
         sections = {}
-        ordered_sections = self.get_sections_in_order(metadata)
-        for order, filepath in enumerate(ordered_sections):
+        for order, filepath in enumerate(metadata.spine):
             raw_data = self.text_files_content[filepath]
 
             extension = filepath.suffix[1:]
@@ -77,18 +76,6 @@ class EpubImporter:
                 title = "NONE"
         return title
 
-    def get_sections_in_order(self, metadata: DocumentMetadata) -> list[str]:
-        ordered_sections = []
-        spine = metadata.spine.find_all("itemref")
-        for section in spine:
-            id = section.get("idref")
-            for file in self.text_files:
-                if file.name == id:
-                    ordered_sections.append(file)
-                    break
-
-        return ordered_sections
-
     def parse_document_metadata(self) -> DocumentMetadata:
         if self.metadata_file_content is None:
             raise ValueError("No metadata_file_content. Try collect_files_data() first")
@@ -99,11 +86,26 @@ class EpubImporter:
             description=self.get_text_from_soup_tag("dc:description", soup),
             lang=self.get_text_from_soup_tag("dc:language", soup),
             title=self.get_text_from_soup_tag("dc:title", soup),
-            manifest=soup.find("manifest"),
-            spine=soup.find("spine"),
+            spine=self.get_sections_in_order_from_spine(soup),
         )
 
         return metadata
+
+    def get_sections_in_order_from_spine(self, soup: BeautifulSoup) -> list[Path]:
+        if not self.text_files:
+            raise ValueError("Missing text_files. Try collect_metadata_and_text_files")
+        if not soup:
+            raise ValueError("Missing soup")
+
+        ordered_section_files = []
+        spin = [itemref["idref"] for itemref in soup.find_all("itemref")]
+
+        # Need the existing Path files, not the path string
+        for section in spin:
+            for readed_file in self.text_files:
+                if readed_file.name == section:
+                    ordered_section_files.append(readed_file)
+        return ordered_section_files
 
     def get_text_from_soup_tag(self, tag: str, soup: BeautifulSoup) -> str | None:
         tag_element = soup.find(tag)
@@ -125,7 +127,7 @@ class EpubImporter:
             self.metadata_file_content = raw_data
 
     def collect_metadata_and_text_files(self, path: Path) -> (list[str], str):
-        text, metadata = [], []
+        text_files, metadata = [], []
         metadata_file = "content.opf"
         text_suffixes = {".xhtml", ".html"}
 
@@ -133,11 +135,11 @@ class EpubImporter:
             if entry.name == metadata_file:
                 metadata = entry
             elif entry.suffix in text_suffixes:
-                text.append(entry)
+                text_files.append(entry)
 
-        self.text_files = text
+        self.text_files = text_files
         self.metadata_file = metadata
-        return text, metadata
+        return text_files, metadata
 
     def extract_epub(self, source: Path, target_path: Path) -> None:
         if any(element.is_dir() for element in target_path.iterdir()):
