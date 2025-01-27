@@ -5,6 +5,11 @@ from src.protocols import ImporterHandler, TransmuterHandler
 
 
 class Scriptorium:
+    def __init__(self):
+        self.importer: ImporterHandler = None
+        self.transmuters: TransmuterHandler | list[TransmuterHandler] = None
+        self.opts: dict = {}
+
     def set_importer(self, importer: ImporterHandler) -> None:
         raise NotImplementedError
 
