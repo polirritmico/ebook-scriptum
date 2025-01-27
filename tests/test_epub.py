@@ -21,6 +21,26 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
+def test_get_spine_from_content_opf(clean_fs) -> None:
+    case_file = Path("tests/files/simple_ebook.epub")
+    expected_files = [
+        "Text/cubierta.xhtml",
+        "Text/TOC.xhtml",
+        "Text/Section0001.xhtml",
+    ]
+
+    epub = EpubImporter()
+    epub.extract_epub(case_file, test_fs)
+    epub.collect_metadata_and_text_files(test_fs)
+    epub.collect_files_data()
+    metadata = epub.parse_document_metadata()
+    assert metadata
+    output = metadata.spine
+
+    for expected, output in zip(expected_files, output):
+        assert Path(expected).name == output.name
+
+
 def test_parse_sections(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_section = "Section0001.xhtml"
@@ -67,25 +87,6 @@ def test_parse_section_title(clean_fs) -> None:
     assert expected_title == output.title
     assert expected_lang == output.lang
     assert expected_order == output.order
-
-
-def test_get_sections_in_order(clean_fs) -> None:
-    case_file = Path("tests/files/simple_ebook.epub")
-    expected_order = [
-        "tests/files/out/OEBPS/Text/cubierta.xhtml",
-        "tests/files/out/OEBPS/Text/TOC.xhtml",
-        "tests/files/out/OEBPS/Text/Section0001.xhtml",
-    ]
-
-    epub = EpubImporter()
-    epub.extract_epub(case_file, test_fs)
-    epub.collect_metadata_and_text_files(test_fs)
-    epub.collect_files_data()
-    metadata = epub.parse_document_metadata()
-    output_order = epub.get_sections_in_order(metadata)
-
-    for expected, output in zip(expected_order, output_order):
-        assert Path(expected) == output
 
 
 def test_parse_metadata(clean_fs) -> None:
