@@ -86,12 +86,12 @@ class EpubImporter:
             description=self.get_text_from_soup_tag("dc:description", soup),
             lang=self.get_text_from_soup_tag("dc:language", soup),
             title=self.get_text_from_soup_tag("dc:title", soup),
-            spine=self.get_sections_in_order_from_spine(soup),
+            spine=self.get_sections_in_order_from_soup(soup),
         )
 
         return metadata
 
-    def get_sections_in_order_from_spine(self, soup: BeautifulSoup) -> list[Path]:
+    def get_sections_in_order_from_soup(self, soup: BeautifulSoup) -> list[Path]:
         if not self.text_files:
             raise ValueError("Missing text_files. Try collect_metadata_and_text_files")
         if not soup:

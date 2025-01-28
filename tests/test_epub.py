@@ -21,7 +21,7 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
-def test_get_spine_from_content_opf(clean_fs) -> None:
+def test_get_sections_in_order_from_content_opf(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_files = [
         "Text/cubierta.xhtml",
