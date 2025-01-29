@@ -4,16 +4,17 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 
 
 @dataclass
-class SectionMetadata:
+class Section:
     content: BeautifulSoup
+    title: str
     filepath: Path
     lang: str
     order: int
-    title: str
+    text: str | None = None
 
 
 @dataclass
@@ -22,4 +23,5 @@ class DocumentMetadata:
     description: str
     lang: str
     title: str
-    spine: list[Path] = None
+    spine: list[Path] | None = None
+    source: Path | None = None

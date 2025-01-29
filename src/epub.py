@@ -8,19 +8,24 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
 from bs4 import BeautifulSoup
 
+from src.dataclass import DocumentMetadata, Section
 from src.document import Document
-from src.metadata import DocumentMetadata, SectionMetadata
 
 
 class EpubImporter:
+    source: Path | None = None
+
     def __init__(self):
         self.text_files = None
         self.metadata_file = None
         self.text_files_content = None
         self.metadata_file_content = None
+        self.parsed_sections = None
+        self.temp_path = None
+        self.source = None
 
     def load_data(self, source: Path) -> None:
-        self.source_data = {}
+        self.source = source
         with TemporaryDirectory(prefix="scriptum_") as tmpdir:
             tmp_path = Path(tmpdir)
             self.extract_epub(source, tmp_path)
@@ -36,7 +41,7 @@ class EpubImporter:
         document.set_sections(sections)
         return document
 
-    def parse_sections(self, metadata: DocumentMetadata) -> dict[str, SectionMetadata]:
+    def parse_sections(self, metadata: DocumentMetadata) -> dict[str, Section]:
         sections = {}
         for order, filepath in enumerate(metadata.spine):
             raw_data = self.text_files_content[filepath]
@@ -48,12 +53,13 @@ class EpubImporter:
                 extension = "lxml"
             content = BeautifulSoup(raw_data, extension)
 
-            section_metadata = SectionMetadata(
+            section_metadata = Section(
                 content=content,
+                title=self.get_section_title(content),
                 filepath=filepath,
                 lang=self.get_section_lang(content),
                 order=order,
-                title=self.get_section_title(content),
+                text=content.get_text(separator="\n"),
             )
             sections[filepath.name] = section_metadata
 
@@ -87,6 +93,7 @@ class EpubImporter:
             lang=self.get_text_from_soup_tag("dc:language", soup),
             title=self.get_text_from_soup_tag("dc:title", soup),
             spine=self.get_sections_in_order_from_soup(soup),
+            source=self.source,
         )
 
         return metadata
