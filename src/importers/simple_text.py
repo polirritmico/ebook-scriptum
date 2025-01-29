@@ -13,10 +13,31 @@ from src.document import Document
 
 
 class SimpleTextImporter:
+    """ImporterHandler subscriptor.
+
+    It infers the title and author by the filename: `<author> - <title>.<ext>`
+    """
+
+    def __init__(self):
+        self.source: Path | None = None
+        self.content: Section | None = None
+        self.metadata: DocumentMetadata | None = None
+
+    # TODO: add support for dirs
     def load_data(self, source: Path) -> None:
-        pass
+        if not source:
+            raise ValueError("Missing source")
+        self.source = source
+        try:
+            encoding = self.detect_encoding(source)
+            content = source.read_text(encoding=encoding)
+            self.content = content
+        except Exception as e:
+            raise Exception(f"Error reading the file {source}: \n{e}")
 
     def generate_document(self) -> Document:
+        if not self.content:
+            raise ValueError("Empty content. Try load_data() first.")
         document = Document()
         metadata = self.build_metadata()
         # sections = self.parse_sections(metadata)
@@ -25,8 +46,10 @@ class SimpleTextImporter:
         # document.set_sections(sections)
         return document
 
-    def build_metadata(self):
-        pass
+    def build_metadata(self) -> DocumentMetadata:
+        # TODO: Redundant?
+        if not self.content:
+            raise ValueError("Empty content. Try load_data() first.")
 
         clean_filename: str = self.source.stem.replace("_", " ")
         parsed_filename: list[str] = clean_filename.split(" - ")
