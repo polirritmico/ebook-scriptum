@@ -8,7 +8,7 @@ COMMIT_HASH ?= $(shell git rev-parse HEAD | cur -c 1-12)
 GREEN = \033[0;32m
 NOSTYLE = \033[0m
 
-default: test-only
+default: test
 
 help:
 	@echo "- Use 'make test' to run all tests and generate a coverage html report"
