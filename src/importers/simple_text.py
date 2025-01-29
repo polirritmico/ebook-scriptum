@@ -81,7 +81,7 @@ class SimpleTextImporter:
 
         return title, creator
 
-    def build_sections(self) -> list[Section]:
+    def build_sections(self) -> dict[str, Section]:
         soup = BeautifulSoup(self.content, "html.parser")
         section = Section(
             content=soup,
@@ -91,7 +91,7 @@ class SimpleTextImporter:
             order=0,
             text=self.content,
         )
-        return [section]
+        return {self.source.name: section}
 
     def infer_content_lang(self, content: str | None = None) -> str:
         content = content if content else self.content
