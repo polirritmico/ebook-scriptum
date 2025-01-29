@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import locale
+import os
 from pathlib import Path
 
 import chardet
@@ -107,7 +107,14 @@ class SimpleTextImporter:
     def get_system_lang(self) -> str:
         failback = "en"
 
-        system_locale, _ = locale.getdefaultlocale()
+        system_locale = None
+        for env in ["LANG", "LANGUAGE", "LC_ALL"]:
+            system_locale = os.getenv(env)
+            if system_locale:
+                break
+
+        if not system_locale:
+            system_locale = failback
         system_lang = system_locale.split("_")[0]
 
         return system_lang or failback
