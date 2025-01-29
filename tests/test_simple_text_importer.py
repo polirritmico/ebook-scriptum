@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import shutil
 from pathlib import Path
 
 import pytest
 
-from src.dataclass import Section
 from src.importers.simple_text import SimpleTextImporter
 
 
@@ -57,6 +55,18 @@ def test_detect_lang() -> None:
 
     assert "en" == importer.infer_content_lang(case_en)
     assert "es" == importer.infer_content_lang(case_es)
+
+
+def test_detect_system_lang(monkeypatch) -> None:
+    case = "es_CL.utf8"
+    expected = "es"
+
+    monkeypatch.setenv("LANG", case)
+
+    importer = SimpleTextImporter()
+    output = importer.get_system_lang()
+
+    assert expected == output
 
 
 def test_detect_encoding() -> None:

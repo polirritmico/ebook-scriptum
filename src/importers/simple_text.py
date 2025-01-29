@@ -102,9 +102,15 @@ class SimpleTextImporter:
         if detected != "unknown":
             return detected
 
+        return self.get_system_lang()
+
+    def get_system_lang(self) -> str:
+        failback = "en"
+
         system_locale, _ = locale.getdefaultlocale()
         system_lang = system_locale.split("_")[0]
-        return system_lang
+
+        return system_lang or failback
 
     def detect_encoding(self, source: Path) -> str:
         default = "utf-8"
