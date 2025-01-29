@@ -20,7 +20,7 @@ class SimpleTextImporter:
 
     def __init__(self):
         self.source: Path | None = None
-        self.content: Section | None = None
+        self.content: str | None = None
         self.metadata: DocumentMetadata | None = None
 
     # TODO: add support for dirs
@@ -38,12 +38,13 @@ class SimpleTextImporter:
     def generate_document(self) -> Document:
         if not self.content:
             raise ValueError("Empty content. Try load_data() first.")
+
         document = Document()
         metadata = self.build_metadata()
-        # sections = self.parse_sections(metadata)
+        sections = self.build_sections()
 
-        # document.set_medatada(metadata)
-        # document.set_sections(sections)
+        document.set_medatada(metadata)
+        document.set_sections(sections)
         return document
 
     def build_metadata(self) -> DocumentMetadata:
@@ -51,10 +52,7 @@ class SimpleTextImporter:
         if not self.content:
             raise ValueError("Empty content. Try load_data() first.")
 
-        clean_filename: str = self.source.stem.replace("_", " ")
-        parsed_filename: list[str] = clean_filename.split(" - ")
-        title = parsed_filename[0]
-        creator = parsed_filename[1] if len(parsed_filename) > 1 else "Author"
+        title, creator = self.get_creator_and_title_from_filename(self.source)
         description = f"'{title}' by {creator}."
         lang_code = self.infer_content_lang()
 
@@ -67,6 +65,33 @@ class SimpleTextImporter:
         )
         self.metadata = metadata
         return metadata
+
+    def get_creator_and_title_from_filename(self, source: Path) -> (str, str):
+        """Return (title, creator) extracted from the given filename."""
+
+        # source -> <author> - <title>
+        clean_filename: str = self.source.stem.replace("_", " ")
+        parsed_filename: list[str] = clean_filename.split(" - ")
+        if len(parsed_filename) > 1:
+            creator = parsed_filename[0]
+            title = parsed_filename[1]
+        else:
+            creator = "Author"
+            title = parsed_filename[0]
+
+        return title, creator
+
+    def build_sections(self) -> list[Section]:
+        soup = BeautifulSoup(self.content, "html.parser")
+        section = Section(
+            content=soup,
+            title=self.metadata.title,
+            filepath=self.source,
+            lang=self.metadata.lang,
+            order=0,
+            text=self.content,
+        )
+        return [section]
 
     def infer_content_lang(self, content: str | None = None) -> str:
         content = content if content else self.content
