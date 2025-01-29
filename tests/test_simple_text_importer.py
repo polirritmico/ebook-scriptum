@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from src.dataclass import Section
 from src.importers.simple_text import SimpleTextImporter
 
 
@@ -22,10 +23,11 @@ def test_read_file() -> None:
     assert output.metadata.creator
     assert output.metadata.description
     assert output.sections
-    assert len(output.sections) > 0
 
-    assert output.sections[0].content
-    assert expected in output.sections[0].text
+    assert case.name in output.sections
+
+    assert output.sections[case.name].content
+    assert expected in output.sections[case.name].text
 
 
 def test_build_metadata() -> None:
@@ -33,7 +35,8 @@ def test_build_metadata() -> None:
     expected_lang = "es"
     expected_title = "Some Title"
     expected_creator = "Author Name"
-    expected_description = "'Some Title' by Author Name"
+    expected_description = "'Some Title' by Author Name."
+    expected_source = case
 
     importer = SimpleTextImporter()
     importer.load_data(case)
@@ -43,7 +46,7 @@ def test_build_metadata() -> None:
     assert expected_title == output.title
     assert expected_creator == output.creator
     assert expected_description == output.description
-    # assert expected_sections == output.sections
+    assert expected_source == output.source
 
 
 def test_detect_lang() -> None:

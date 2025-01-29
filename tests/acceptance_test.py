@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
 
 from src.document import Document
-from src.epub import EpubImporter
+from src.importers.epub import EpubImporter
 
 # from src.models.qwen2_5 import ModelQwen
 from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
 from src.scriptorium import Scriptorium
-from src.translator import Translator
+from src.transmuters.translator import Translator
 
 
 @pytest.fixture
