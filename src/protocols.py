@@ -8,14 +8,14 @@ from typing import Any, Protocol, runtime_checkable
 from src.document import Document
 
 
-class ModelType(Enum):
-    OLLAMA = 1
+class TransmuterType(Enum):
+    LLM = 1
     TTS = 2
 
 
 @runtime_checkable
 class ModelHandler(Protocol):
-    model_type: ModelType
+    transmuter_type: TransmuterType
     id: str
 
     def response_validator(self, response, request) -> bool: ...
@@ -23,6 +23,8 @@ class ModelHandler(Protocol):
 
 
 class TransmuterHandler(Protocol):
+    transmuter_type: TransmuterType
+
     def transmute(self, document: Document) -> None: ...
 
 

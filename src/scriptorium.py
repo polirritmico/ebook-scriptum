@@ -71,3 +71,6 @@ class Scriptorium:
 
     def export(self):
         raise NotImplementedError
+
+    def collect_transmuters(self, type: TransmuterHandler):
+        pass

@@ -19,9 +19,9 @@ class Section:
 
 @dataclass
 class DocumentMetadata:
-    creator: str
-    description: str
-    lang: str
     title: str
-    spine: list[Path] | None = None
+    creator: str
+    lang: str
+    description: str
     source: Path | None = None
+    spine: list[Path] | None = None

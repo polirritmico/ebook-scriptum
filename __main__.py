@@ -6,10 +6,10 @@ from src.scriptorium import Scriptorium
 
 def main():
     from src.coqui import CoquiTTS
-    from src.simpletext import SimpleTextImporter
+    from src.importers.simple_text import SimpleTextImporter
 
     input_files = [
-        "files/test.txt",
+        "tests/files/test.txt",
     ]
     opts = {}
 

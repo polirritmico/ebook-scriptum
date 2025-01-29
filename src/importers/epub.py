@@ -88,12 +88,12 @@ class EpubImporter:
 
         soup = BeautifulSoup(self.metadata_file_content, "xml")
         metadata = DocumentMetadata(
-            creator=self.get_text_from_soup_tag("dc:creator", soup),
-            description=self.get_text_from_soup_tag("dc:description", soup),
-            lang=self.get_text_from_soup_tag("dc:language", soup),
             title=self.get_text_from_soup_tag("dc:title", soup),
-            spine=self.get_sections_in_order_from_soup(soup),
+            creator=self.get_text_from_soup_tag("dc:creator", soup),
+            lang=self.get_text_from_soup_tag("dc:language", soup),
+            description=self.get_text_from_soup_tag("dc:description", soup),
             source=self.source,
+            spine=self.get_sections_in_order_from_soup(soup),
         )
 
         return metadata
