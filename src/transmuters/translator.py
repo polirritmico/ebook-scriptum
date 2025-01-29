@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from protocols import TransmuterType
 from src.document import Document
+from src.protocols import TransmuterType
 
 
 class Translator:
