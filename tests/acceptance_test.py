@@ -8,8 +8,7 @@ import pytest
 
 from src.document import Document
 from src.importers.epub import EpubImporter
-
-# from src.models.qwen2_5 import ModelQwen
+from src.models.qwen2_5 import ModelQwen
 from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
 from src.scriptorium import Scriptorium
 from src.transmuters.translator import Translator
