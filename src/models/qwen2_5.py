@@ -32,12 +32,12 @@ class ModelQwen:
         self.id = id if id else self.id
         self.instruction = instruction if instruction else self.base_instruction
 
-    def make_instructions(self, text_to_translate: str) -> Any:
+    def make_instructions(self, content) -> Any:
         return {
             "model": self.id,
             "messages": [
                 {"role": "system", "content": self.instruction},
-                {"role": "user", "content": text_to_translate},
+                {"role": "user", "content": content},
             ],
         }
 
