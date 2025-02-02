@@ -19,7 +19,7 @@ def main():
 
     scriptum = Scriptorium()
     scriptum.set_options(opts)
-    scriptum.synthesize()
+    scriptum.synthesize_transmutation()
     scriptum.crystallize()
 
 

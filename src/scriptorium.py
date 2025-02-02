@@ -20,6 +20,10 @@ class Scriptorium:
 
         self.collector = CatalystCollector()
 
+    def synthesize_transmutation(self):
+        if not self.options or not isinstance(self.options, dict):
+            raise ValueError("Missing options. Try set_options() first.")
+
     def set_importer(self, importer: ImporterHandler) -> None:
         self.importer = importer
 
