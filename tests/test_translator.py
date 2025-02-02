@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pytest
-
 from src.models.llama3_2 import ModelLlama3_2
 from src.transmuters.translator import Translator
 
