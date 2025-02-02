@@ -23,7 +23,7 @@ class Translator:
     transmuter_type: TransmuterType
 
     def __init__(self, model: ModelHandler | None = None):
-        self.set_model(model or DefaultModel)
+        self.set_model(model or DefaultModel())
 
     def set_model(self, model: ModelHandler) -> None:
         self.model = model or DefaultModel()
