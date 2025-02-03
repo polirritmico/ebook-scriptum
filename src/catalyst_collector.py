@@ -14,6 +14,7 @@ class CatalystCollector:
     def collect_handler(
         self, handler_name: str, source_path: str
     ) -> ImporterHandler | TransmuterHandler:
+        """Returns the handler class (not the instance)"""
         if not handler_name or not source_path:
             raise ValueError("Can't import handler. Check parameters")
 
