@@ -12,7 +12,7 @@ from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
 
 class CatalystCollector:
     IMPORTERS_SOURCE_PATH = "src.importers"
-    MODELS_SOURCE_PATH = "src.modules"
+    MODELS_SOURCE_PATH = "src.models"
     TRANSMUTERS_SOURCE_PATH = "src.transmuters"
 
     def collect_importer_handler(self, name: str) -> ImporterHandler:
@@ -29,7 +29,7 @@ class CatalystCollector:
         """Returns the class subscribed to the ModelHandler protocol (not the instance)"""
         if not name:
             return None
-        Importer = self.collect_handler(name, self.IMPORTERS_SOURCE_PATH)
+        Importer = self.collect_handler(name, self.MODELS_SOURCE_PATH)
         return Importer
 
     def collect_handler(
