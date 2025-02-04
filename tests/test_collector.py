@@ -6,6 +6,15 @@ from src.importers.epub import EpubImporter
 from src.transmuters.translator import Translator
 
 
+def test_collect_model() -> None:
+    case = "ModelQwen"
+
+    collector = CatalystCollector()
+    output = collector.collect_model_handler(case)
+
+    assert case == output.__name__
+
+
 def test_collect_config_in_directory() -> None:
     case = "tests/files/"
     expected_lang = "es"
