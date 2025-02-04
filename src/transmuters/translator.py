@@ -62,7 +62,7 @@ class Translator:
             if attempts == self.max_retry_attemps:
                 return response
 
-    def generic_validator(self, response: str | None, original: str) -> bool:
+    def generic_response_validator(self, response: str | None, original: str) -> bool:
         if response is None:
             return False
         if "  " in response and "  " not in original:
