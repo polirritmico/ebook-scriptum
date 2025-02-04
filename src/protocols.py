@@ -25,15 +25,16 @@ class ModelHandler(Protocol):
     def make_instructions(self, content) -> Any: ...
 
 
+@runtime_checkable
 class TransmuterHandler(Protocol):
     transmuter_type: TransmuterType
-    generic_validator: ResponseValidator
+    generic_response_validator: ResponseValidator
 
-    def __init__(self, model: ModelHandler | None = None): ...
     def set_model(self, model: ModelHandler) -> None: ...
     def transmute(self, document: Document) -> None: ...
 
 
+@runtime_checkable
 class ImporterHandler(Protocol):
     source: Path | None = None
 
