@@ -22,8 +22,8 @@ class Translator:
     run_validator: Callable[[str | None, str], bool]
     transmuter_type: TransmuterType = TransmuterType.LLM
 
-    def set_model(self, model: ModelHandler) -> None:
-        if model.transmuter_type != self.transmuter_type:
+    def set_model(self, model: ModelHandler | None) -> None:
+        if model and model.transmuter_type != self.transmuter_type:
             msg = f"ModelHandler {model.transmuter_type} incompatible with {self.transmuter_type}"
             raise TypeError(msg)
         self.model = model or DefaultModel()
