@@ -7,13 +7,34 @@ import importlib
 import json
 from pathlib import Path
 
-from src.protocols import ImporterHandler, TransmuterHandler
+from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
 
 
 class CatalystCollector:
+    IMPORTERS_SOURCE_PATH = "src.importers"
+    MODELS_SOURCE_PATH = "src.modules"
+    TRANSMUTERS_SOURCE_PATH = "src.transmuters"
+
+    def collect_importer_handler(self, name: str) -> ImporterHandler:
+        """Returns the class subscribed to the InputHandler protocol (not the instance)"""
+        Importer = self.collect_handler(name, self.IMPORTERS_SOURCE_PATH)
+        return Importer
+
+    def collect_transmuter_handler(self, name: str) -> TransmuterHandler:
+        """Returns the class subscribed to the TransmuterHandler protocol (not the instance)"""
+        Transmuter = self.collect_handler(name, self.TRANSMUTERS_SOURCE_PATH)
+        return Transmuter
+
+    def collect_model_handler(self, name: str) -> ModelHandler | None:
+        """Returns the class subscribed to the ModelHandler protocol (not the instance)"""
+        if not name:
+            return None
+        Importer = self.collect_handler(name, self.IMPORTERS_SOURCE_PATH)
+        return Importer
+
     def collect_handler(
         self, handler_name: str, source_path: str
-    ) -> ImporterHandler | TransmuterHandler:
+    ) -> ImporterHandler | TransmuterHandler | ModelHandler:
         """Returns the handler class (not the instance)"""
         if not handler_name or not source_path:
             raise ValueError("Can't import handler. Check parameters")
