@@ -25,6 +25,8 @@ class EpubImporter:
         self.source = None
 
     def load_data(self, source: Path) -> None:
+        if not source:
+            raise ValueError("load_data: Empty source path")
         self.source = source
         with TemporaryDirectory(prefix="scriptum_") as tmpdir:
             tmp_path = Path(tmpdir)
