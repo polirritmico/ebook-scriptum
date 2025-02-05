@@ -20,8 +20,12 @@ class Scriptorium:
 
     def setup(self, opts: dict | str | Path = None) -> None:
         self.options.setup(opts)
+        self.set_options()
         self.set_importer()
         self.set_transmuters()
+
+    def set_options(self) -> None:
+        self.input_files = self.options.input_file
 
     def set_importer(self, importer: ImporterHandler | None = None) -> None:
         self.importer = importer or self.options.importer
@@ -40,7 +44,7 @@ class Scriptorium:
         self.document = self.importer.generate_document()
         return self.document
 
-    def transmute(self, document: Document) -> None:
+    def transmute(self, document: Document | None = None) -> None:
         document = document if document else self.document
         for transmuter in self.transmuters:
             transmuter.transmute(document)
