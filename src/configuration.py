@@ -49,8 +49,8 @@ class ScriptoriumConfiguration:
         self.initialize_handlers()
 
     def initialize_handlers(self) -> None:
-        instantiated_importer = isinstance(self.importer, ImporterHandler)
-        if not instantiated_importer:
+        uninstantiated_importer = isinstance(self.importer, type)
+        if uninstantiated_importer:
             self.importer = self.importer()
 
         if self.transmuters_types:
@@ -99,11 +99,6 @@ class ScriptoriumConfiguration:
 
         return transmuters
 
-    # TODO: Add check_missing_keys function, should return the errors
-    # (list[str]). Add check_value_types, should return the same list of strings
-    # with errors. Move the specification to the header, even the init. So its
-    # well defined for the configuration class, maybe a user or input
-    # configuration class.
     def check_spec_compliance(self, opts: dict) -> None:
         missing_entries_err = self.check_input_opts_missing_entries(opts)
         mismatch_settings_err = self.check_input_opts_mismatch_types(opts)
