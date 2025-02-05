@@ -53,11 +53,12 @@ class CatalystCollector:
 
         raise ImportError(f"Could not import handler {handler_name} from {module_name}")
 
-    def collect_options(self, opts: dict | Path = None) -> dict[str, str | list[str]]:
+    def collect_options(self, opts: dict | str) -> dict[str, str | dict[str, str]]:
         if isinstance(opts, dict):
             return opts
 
-        opts_path = Path(opts)
+        opts_path = opts if isinstance(opts, Path) else Path(opts)
+
         if opts_path.is_dir():
             opts_path /= "config.json"
         if not opts_path.is_file():
