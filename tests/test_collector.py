@@ -22,9 +22,10 @@ def test_collect_config_in_directory() -> None:
 
     collector = CatalystCollector()
     output = collector.collect_options(case)
+    output_metadata = output.get("metadata")
 
-    assert expected_lang == output.get("lang")
     assert expected_input == output.get("input")
+    assert expected_lang == output_metadata.get("lang")
     assert output.get("importer")
     assert output.get("transmuters")
 
