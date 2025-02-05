@@ -20,7 +20,7 @@ def tmp_dir():
         yield tmp
 
 
-def test_epub_importer_handler_protocol_compliance(tmp_dir) -> None:
+def test_epub_importer_handler_protocol_compliance() -> None:
     case_file = Path("tests/files/simple_ebook.epub")
 
     epub = EpubImporter()
@@ -31,27 +31,18 @@ def test_epub_importer_handler_protocol_compliance(tmp_dir) -> None:
 
 
 @pytest.mark.skip(reason="Not implemented")
-def test_translate_full_ebook(tmp_dir, file_loader) -> None:
+def test_translate_full_ebook(tmp_dir) -> None:
     case = {
-        "file_input": "tests/files/simple_ebook.epub",
-        "output_file": "tests/files/mock.epub",
+        "input": "tests/files/simple_ebook.epub",
+        "output": "tests/files/mock.epub",
+        "transmuters": {"Translator": ""},
+        "importer": "EpubImporter",
     }
-    expected = file_loader("tests/files/simple_ebook_expected.html")
-
-    importer: ImporterHandler = EpubImporter()
-    model: ModelHandler = ModelQwen()
-    translator: TransmuterHandler = Translator(model)
 
     scriptum = Scriptorium()
-    scriptum.set_importer(importer)
-    scriptum.set_transmuters(translator)
-    scriptum.set_options(case)  # After this the system behaviour is fully setted
-    scriptum.load_data()  # The ImporterHandler gets the data from the source, then generates a Document instance # fmt: skip
-    scriptum.transmute()  # The TransmuterHandler receives the Document and perform the Transmutation # fmt: skip
-    scriptum.validate_output()  # TODO: Who validates the output? ExportHandler -> IOHandler?
-    output = scriptum.export()
-
-    assert output
-    assert len(expected) == len(output)
-    for expected_line, output_line in zip(expected.split("\n"), output.split("\n")):
-        assert expected_line == output_line
+    scriptum.setup(case)
+    scriptum.load_data()
+    # scriptum.transmute()
+    # scriptum.validate_output()
+    # output = scriptum.export()
+    # assert output
