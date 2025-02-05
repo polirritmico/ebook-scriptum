@@ -1,43 +1,51 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import pytest
+
 from src.models.llama3_2 import ModelLlama3_2
 from src.transmuters.translator import Translator
+
+
+@pytest.fixture
+def translator() -> None:
+    translator = Translator()
+    translator.set_model(None)
+    return translator
 
 
 def test_ollama_basic_translation() -> None:
     case = "Hello, World!"
     expected = ["hola", "mundo", "!"]
 
-    translator = Translator(ModelLlama3_2())
+    translator = Translator()
+    translator.set_model(ModelLlama3_2())
     output = translator.translate_text(case)
 
     for expected_word in expected:
         assert expected_word in output.lower()
 
 
-def test_translation_with_tags() -> None:
+def test_translation_with_tags(translator) -> None:
     case = "This paragraph has <b>bold</b> text."
     expected = ["párrafo", "<b>", "</b>"]
 
-    translator = Translator()
     output = translator.translate_text(case)
 
     for expected_word in expected:
         assert expected_word in output.lower()
 
 
-def test_translation_with_link() -> None:
+def test_translation_with_link(translator) -> None:
     case = '<p class="bar foo" style="color:red">This paragraph has a <a href="target">inner</a> link.</p>'
     expected = '<a href="target">'
 
-    translator = Translator()
     output = translator.translate_text(case)
 
     assert expected in output.lower()
 
 
-def test_response_validator() -> None:
+def test_response_validator(translator) -> None:
     case1 = "aaa bbbb 12345"
     case2 = "a 整,没有a额"
     case3 = "aaaa 应当aaa"
@@ -52,7 +60,6 @@ def test_response_validator() -> None:
     case11a = "aaaa 应  当aaa"
     case11b = "aaaa 应 当aaa"
 
-    translator = Translator()
     assert translator.model.response_validator(case1, case1)
     assert translator.model.response_validator(case2, case2)
     assert translator.model.response_validator(case3, case3)
@@ -66,7 +73,7 @@ def test_response_validator() -> None:
     assert not translator.model.response_validator(case11a, case11b)
 
 
-def test_validate_translation() -> None:
+def test_validate_translation(translator) -> None:
     case = "aaaa"
     expected = "aaa a"
     expected_calls = 4
@@ -78,7 +85,6 @@ def test_validate_translation() -> None:
         attempts += 1
         return "aa  aa" if attempts < 4 else "aaa a"
 
-    translator = Translator()
     translator.send_prompt = fake_send_prompt
     output = translator.translate_text(case)
 
@@ -86,7 +92,7 @@ def test_validate_translation() -> None:
     assert output == expected
 
 
-def test_bad_response() -> None:
+def test_bad_response(translator) -> None:
     case = "aaaa"
     expected = "aa  aa"
     expected_calls = 10
@@ -98,7 +104,6 @@ def test_bad_response() -> None:
         attempts += 1
         return "aa  aa"
 
-    translator = Translator()
     translator.send_prompt = fake_send_prompt_corrupted
     output = translator.translate_text(case)
 
