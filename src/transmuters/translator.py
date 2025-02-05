@@ -44,17 +44,31 @@ class Translator:
     def transmute(self, document: Document) -> None:
         self.check_ollama()
 
-    def send_prompt(self, text_to_translate: str = None) -> str:
-        msg = self.model.make_instructions(text_to_translate)
-        response: ChatResponse = chat(**msg)
-        response_text = self.get_text_from_response(response)
-        return response_text
+        for section_name, section in document.sections.items():
+            self.translate_section_metadata(section)
+            self.translate_section_content(section)
 
     def check_ollama(self) -> None:
         try:
             ollama_list()
         except Exception:
             raise
+
+    def translate_section_metadata(self, section: Section) -> None:
+        section.title = self.translate_metadata(section.title)
+
+    def translate_metadata(self, text: str) -> str | None:
+        if text in self.translated_metadata:
+            return self.translated_metadata[text]
+
+        translated_text = self.translate_text(text)
+        self.translated_metadata[text] = translated_text
+
+    def translate_section_content(self, section: Section) -> str:
+        for tag in section.content:
+            translated_text = self.translate_text(section.text)
+            section.text = translated_text
+            # section.update_tag(translated_text, tag)
 
     def translate_text(self, text: str) -> str:
         attempts = 0
@@ -65,6 +79,18 @@ class Translator:
             attempts += 1
             if attempts == self.max_retry_attemps:
                 return response
+
+    def send_prompt(self, text_to_translate: str = None) -> str:
+        msg = self.model.make_instructions(text_to_translate)
+        response: ChatResponse = chat(**msg)
+        response_text = self.get_text_from_response(response)
+        return response_text
+
+    def get_text_from_response(self, response: ChatResponse) -> str:
+        try:
+            return response.message.content
+        except AttributeError:
+            return ""
 
     def generic_response_validator(self, response: str | None, original: str) -> bool:
         if response is None:
