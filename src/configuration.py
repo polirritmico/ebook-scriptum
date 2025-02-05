@@ -2,38 +2,65 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
+from typing import Tuple
 
 from src.catalyst_collector import CatalystCollector
 from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
 
+type TransmutersWithModel = list[Tuple[TransmuterHandler, ModelHandler]]
+
 
 class ScriptoriumConfiguration:
+    config_spec = {
+        "input": {"types": (str, Path), "mandatory": True},
+        "output": {"types": (str, Path), "mandatory": False},
+        "importer": {"types": (str,), "mandatory": True},
+        "transmuters": {"types": (dict,), "mandatory": True},
+    }
+
     def __init__(self) -> None:
         self.importer: ImporterHandler | None = None
         self.input_file: Path | None = None
         self.output: Path | None = None
         self.raw_opts: dict | None = None
-        self.transmuters: dict[TransmuterHandler, ModelHandler] | None = None
+        self.transmuters: list[TransmuterHandler] | None = None
+        self.transmuters_types: TransmutersWithModel | None = None
 
         self.collector = CatalystCollector()
 
-    def set_options(self, opts: dict) -> None:
+    def setup(self, opts: dict | str | Path) -> "ScriptoriumConfiguration":
+        opts = self.set_options(opts)
+        self.parse_options(opts)
+        return self
+
+    def set_options(self, opts: dict | str | Path) -> dict:
+        opts = self.collector.collect_options(opts)
         self.raw_opts = opts.copy()
-        self.check_minimun_required_keys(opts)
+        self.check_spec_compliance(opts)
+        return opts
+
+    def parse_options(self, opts: dict | None = None) -> None:
+        opts = opts or self.raw_opts.copy()
+        if not opts:
+            raise ValueError("Missing opts. Try set_options() first.")
+
         self.parse_non_handlers(opts)
         self.parse_handlers(opts)
         self.initialize_handlers()
 
     def initialize_handlers(self) -> None:
-        self.importer: ImporterHandler = self.importer()
+        instantiated_importer = isinstance(self.importer, ImporterHandler)
+        if not instantiated_importer:
+            self.importer = self.importer()
 
-        instantiated_transmuters = []
-        for Transmuter, Model in self.transmuters:
-            model = Model() if Model is not None else None
-            transmuter = Transmuter()
-            transmuter.set_model(model)
-            instantiated_transmuters.append(transmuter)
-        self.transmuters = instantiated_transmuters
+        if self.transmuters_types:
+            instantiated_transmuters = []
+            for Transmuter, Model in self.transmuters_types:
+                model = Model() if Model is not None else None
+                transmuter = Transmuter()
+                transmuter.set_model(model)
+                instantiated_transmuters.append(transmuter)
+            self.transmuters = instantiated_transmuters
 
     def parse_non_handlers(self, opts: dict) -> None:
         self.input_file = Path(opts.get("input"))
@@ -41,24 +68,27 @@ class ScriptoriumConfiguration:
         self.output = Path(opts.get("output"))
         self.check_dir(self.output)
 
+        metadata = opts.get("metadata")
+        if metadata:
+            self.metadata = opts.get("metadata")
+
     def parse_handlers(self, opts: dict) -> None:
         if not self.importer:
             self.importer = self.get_importer(opts)
 
         if not self.transmuters:
-            self.transmuters = self.get_transmuter_model_pairs(opts)
+            self.transmuters_types = self.get_transmuter_model_pairs(opts)
 
     def get_importer(self, opts: dict) -> ImporterHandler:
         importer_name = opts.get("importer")
         Importer = self.collector.collect_importer_handler(importer_name)
         if not Importer:
             raise ValueError("Missing importer")
-
         return Importer
 
-    def get_transmuter_model_pairs(self, opts: dict) -> list[TransmuterHandler]:
+    def get_transmuter_model_pairs(self, opts: dict) -> TransmutersWithModel:
         transmuters_names = opts.get("transmuters")
-        transmuters = []
+        transmuters: TransmutersWithModel = []
         for transmuter_name, model_name in transmuters_names.items():
             Transmuter = self.collector.collect_transmuter_handler(transmuter_name)
             Model = self.collector.collect_model_handler(model_name)
@@ -69,25 +99,56 @@ class ScriptoriumConfiguration:
 
         return transmuters
 
-    def check_minimun_required_keys(self, opts: dict) -> None:
-        required_keys = [
-            "input",
-            "output",
-            "transmuters",
-            "importer",  # TODO: infer importer from the input
-        ]
+    # TODO: Add check_missing_keys function, should return the errors
+    # (list[str]). Add check_value_types, should return the same list of strings
+    # with errors. Move the specification to the header, even the init. So its
+    # well defined for the configuration class, maybe a user or input
+    # configuration class.
+    def check_spec_compliance(self, opts: dict) -> None:
+        missing_entries_err = self.check_input_opts_missing_entries(opts)
+        mismatch_settings_err = self.check_input_opts_mismatch_types(opts)
 
-        missing_keys = []
-        for required_key in required_keys:
-            if required_key not in opts.keys():
-                msg = f"  - Missing parameter: '{required_key}'"
-                missing_keys.append(msg)
-            elif opts[required_key] is None:
-                msg = f"  - Missing {required_key} value"
-                missing_keys.append(msg)
+        detected_errors = missing_entries_err or mismatch_settings_err
+        if detected_errors:
+            msg = "Errors detected. Check passed options.\n"
+            errors_msg = [msg] + missing_entries_err + mismatch_settings_err
+            raise ValueError("\n".join(errors_msg))
 
-        if missing_keys:
-            raise KeyError(f"opts is missing required setting:\n{missing_keys}")
+    def check_input_opts_mismatch_types(self, opts: dict) -> list[str]:
+        detected_type_mismatches = []
+        for key, spec in self.config_spec.items():
+            valid_types = spec.get("types")
+            opt_value_type = type(opts.get(key))
+            if opt_value_type not in valid_types:
+                opt_value_type = opt_value_type.__name__
+                expected_types = ", ".join(_type.__name__ for _type in valid_types)
+                err = (
+                    f"  - Key '{key}' has incorrect type: found '{opt_value_type}', "
+                    f"but '{expected_types}' is required"
+                )
+                detected_type_mismatches.append(err)
+
+        return detected_type_mismatches
+
+    def check_input_opts_missing_entries(self, opts: dict) -> list[str]:
+        # TEST: This should not return an error with "" values (e.g. default model)
+        detected_missing_keys = []
+        for key, spec in self.config_spec.items():
+            if not spec["mandatory"]:
+                continue
+
+            if key not in opts:
+                err = f"  - Missing '{key}'"
+                detected_missing_keys.append(err)
+            elif opts[key] is None:
+                err = f"  - Mandatory value is None: '{key}'"
+                detected_missing_keys.append(err)
+
+        if detected_missing_keys:
+            err = "Found missing parameters in options:"
+            detected_missing_keys.insert(0, err)
+
+        return detected_missing_keys
 
     def check_dir(self, dir: Path, mkdir: bool = True) -> None:
         # 755 owner|group|others, 7: read+write+execute; 5: read+execute
