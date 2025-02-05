@@ -4,7 +4,9 @@
 from typing import Callable
 
 from ollama import ChatResponse, chat
+from ollama import list as ollama_list
 
+from src.dataclass import Section
 from src.document import Document
 from src.models.qwen2_5 import ModelQwen as DefaultModel
 from src.protocols import ModelHandler, TransmuterType
@@ -22,6 +24,13 @@ class Translator:
     run_validator: Callable[[str | None, str], bool]
     transmuter_type: TransmuterType = TransmuterType.LLM
 
+    def __init__(self):
+        self.translated_metadata: dict[str, str] = {}
+        self.model = None
+        self.response = None
+        self.run_validator = None
+        self.max_retry_attemps = 10
+
     def set_model(self, model: ModelHandler | None) -> None:
         if model and model.transmuter_type != self.transmuter_type:
             msg = f"ModelHandler {model.transmuter_type} incompatible with {self.transmuter_type}"
@@ -33,12 +42,7 @@ class Translator:
             self.run_validator = self.generic_response_validator
 
     def transmute(self, document: Document) -> None:
-        raise NotImplementedError
-        for section_name, content in document.sections.items():
-            self.translate_section(section_name, content)
-
-    def translate_section(self, name: str, content) -> str:
-        raise NotImplementedError
+        self.check_ollama()
 
     def send_prompt(self, text_to_translate: str = None) -> str:
         msg = self.model.make_instructions(text_to_translate)
@@ -46,11 +50,11 @@ class Translator:
         response_text = self.get_text_from_response(response)
         return response_text
 
-    def get_text_from_response(self, response: ChatResponse) -> str:
+    def check_ollama(self) -> None:
         try:
-            return response.message.content
-        except AttributeError:
-            return ""
+            ollama_list()
+        except Exception:
+            raise
 
     def translate_text(self, text: str) -> str:
         attempts = 0
