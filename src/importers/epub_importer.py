@@ -27,6 +27,9 @@ class EpubImporter:
     def load_data(self, source: Path) -> None:
         if not source:
             raise ValueError("load_data: Empty source path")
+        if not isinstance(source, Path):
+            raise TypeError(f"source should be a Path object: {type(source)}")
+
         self.source = source
         with TemporaryDirectory(prefix="scriptum_") as tmpdir:
             tmp_path = Path(tmpdir)
@@ -142,7 +145,7 @@ class EpubImporter:
 
         for entry in path.rglob("*"):
             if entry.name == metadata_file:
-                metadata = entry
+                metadata = entry  # TODO: What if more than one file is founded?
             elif entry.suffix in text_suffixes:
                 text_files.append(entry)
 
