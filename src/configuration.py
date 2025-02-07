@@ -5,7 +5,12 @@ from pathlib import Path
 from typing import Tuple
 
 from src.catalyst_collector import CatalystCollector
-from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
+from src.protocols import (
+    ExporterHandler,
+    ImporterHandler,
+    ModelHandler,
+    TransmuterHandler,
+)
 
 type TransmutersWithModel = list[Tuple[TransmuterHandler, ModelHandler]]
 
@@ -15,11 +20,13 @@ class ScriptoriumConfiguration:
         "input": {"types": (str, Path), "mandatory": True},
         "output": {"types": (str, Path), "mandatory": False},
         "importer": {"types": (str,), "mandatory": True},
+        "exporter": {"types": (str,), "mandatory": True},
         "transmuters": {"types": (dict,), "mandatory": True},
     }
 
     def __init__(self) -> None:
         self.importer: ImporterHandler | None = None
+        self.exporter: ExporterHandler | None = None
         self.input_file: Path | None = None
         self.output: Path | None = None
         self.raw_opts: dict | None = None
@@ -53,6 +60,10 @@ class ScriptoriumConfiguration:
         if uninstantiated_importer:
             self.importer = self.importer()
 
+        uninstantiated_exporter = isinstance(self.exporter, type)
+        if uninstantiated_exporter:
+            self.exporter = self.exporter()
+
         if self.transmuters_types:
             instantiated_transmuters = []
             for Transmuter, Model in self.transmuters_types:
@@ -76,6 +87,9 @@ class ScriptoriumConfiguration:
         if not self.importer:
             self.importer = self.get_importer(opts)
 
+        if not self.exporter:
+            self.exporter = self.get_exporter(opts)
+
         if not self.transmuters:
             self.transmuters_types = self.get_transmuter_model_pairs(opts)
 
@@ -85,6 +99,13 @@ class ScriptoriumConfiguration:
         if not Importer:
             raise ValueError("Missing importer")
         return Importer
+
+    def get_exporter(self, opts: dict) -> ExporterHandler:
+        exporter_name = opts.get("exporter")
+        Exporter = self.collector.collect_exporter_handler(exporter_name)
+        if not Exporter:
+            raise ValueError("Missing exporter")
+        return Exporter
 
     def get_transmuter_model_pairs(self, opts: dict) -> TransmutersWithModel:
         transmuters_names = opts.get("transmuters")
