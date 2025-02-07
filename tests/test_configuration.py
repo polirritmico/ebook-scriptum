@@ -16,6 +16,7 @@ def test_transmuter_and_importer_not_overwriten_by_config() -> None:
         "output": "tests/files/mock.epub",
         "transmuters": {"Translator": ""},
         "importer": "EpubImporter",
+        "exporter": "EpubExporter",
     }
 
     case_importer = SimpleTextImporter()
@@ -61,6 +62,7 @@ def test_minimal_keys_check_ok() -> None:
         "output": "tests/files/output",
         "transmuters": {"Translator": ""},
         "importer": "EpubImporter",
+        "exporter": "EpubExporter",
     }
     config = ScriptoriumConfiguration()
     config.check_spec_compliance(case)
@@ -71,6 +73,7 @@ def test_minimal_keys_check_missing_input() -> None:
         "output": "tests/files/output",
         "transmuters": {"Translator": ""},
         "importer": "EpubImporter",
+        "exporter": "EpubExporter",
     }
     with pytest.raises(ValueError) as error:
         config = ScriptoriumConfiguration()
@@ -88,6 +91,7 @@ def test_detect_opts_mismatch_types_with_spec() -> None:
         "output": "tests/files/output",
         "transmuters": {"Translator": ""},
         "importer": ["EpubImporter"],  # this should not be a list
+        "exporter": "EpubExporter",
     }
     expected = ["type", "importer", "list", "str"]
 
@@ -106,6 +110,7 @@ def test_parse_opts() -> None:
         "output": "tests/files/output",
         "transmuters": {"Translator": ""},
         "importer": "EpubImporter",
+        "exporter": "EpubExporter",
     }
     ExpectedType = ImporterHandler
 
@@ -123,6 +128,7 @@ def test_parse_opts_model() -> None:
         "output": "tests/files/output",
         "transmuters": {"Translator": "ModelLlama3_2"},
         "importer": "EpubImporter",
+        "exporter": "EpubExporter",
     }
     ExpectedType = ModelLlama3_2
 
