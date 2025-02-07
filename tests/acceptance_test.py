@@ -8,10 +8,7 @@ import pytest
 
 from src.document import Document
 from src.importers.epub import EpubImporter
-from src.models.qwen2_5 import ModelQwen
-from src.protocols import ImporterHandler, ModelHandler, TransmuterHandler
 from src.scriptorium import Scriptorium
-from src.transmuters.translator import Translator
 
 
 @pytest.fixture
@@ -30,19 +27,19 @@ def test_epub_importer_handler_protocol_compliance() -> None:
     assert output.metadata
 
 
-@pytest.mark.skip(reason="Not implemented")
+# @pytest.mark.skip(reason="Slow execution")
 def test_translate_full_ebook(tmp_dir) -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
-        "output": "tests/files/mock.epub",
+        "output": "tests/files/output.epub",
         "transmuters": {"Translator": ""},
         "importer": "EpubImporter",
+        "exporter": "EpubExporter",
     }
 
     scriptum = Scriptorium()
     scriptum.setup(case)
     scriptum.load_data()
-    # scriptum.transmute()
+    scriptum.transmute()
     # scriptum.validate_output()
-    # output = scriptum.export()
-    # assert output
+    scriptum.export()
