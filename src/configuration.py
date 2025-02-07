@@ -77,7 +77,8 @@ class ScriptoriumConfiguration:
         self.input_file = Path(opts.get("input"))
         self.check_file(self.input_file)
         self.output = Path(opts.get("output"))
-        self.check_dir(self.output)
+        if self.output.is_dir():
+            self.check_dir(self.output)
 
         metadata = opts.get("metadata")
         if metadata:
@@ -167,13 +168,11 @@ class ScriptoriumConfiguration:
         return detected_missing_keys
 
     def check_dir(self, dir: Path, mkdir: bool = True) -> None:
-        # 755 owner|group|others, 7: read+write+execute; 5: read+execute
-        mkdir_mode = 0o755
         if not dir.exists():
             if not mkdir:
                 raise ValueError(f"Output path does not exists: {dir}")
-
-            dir.mkdir(mode=mkdir_mode, parents=True)
+            # 755 owner|group|others, 7: read+write+execute; 5: read+execute
+            dir.mkdir(mode=0o755, parents=True)
 
     def check_file(self, file: Path) -> None:
         if not file.exists():
