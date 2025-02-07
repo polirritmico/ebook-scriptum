@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.configuration import ScriptoriumConfiguration
 from src.document import Document
-from src.protocols import ImporterHandler, TransmuterHandler
+from src.protocols import ExporterHandler, ImporterHandler, TransmuterHandler
 
 
 class Scriptorium:
@@ -13,19 +13,23 @@ class Scriptorium:
 
     def __init__(self):
         self.importer: ImporterHandler | None = None
+        self.exporter: ExporterHandler | None = None
         self.transmuters: TransmuterHandler | list[TransmuterHandler] | None = None
         self.options: ScriptoriumConfiguration = ScriptoriumConfiguration()
         self.document: Document | None = None
         self.input_files: list[Path] | None = None
+        self.output: Path | None = None
 
     def setup(self, opts: dict | str | Path = None) -> None:
         self.options.setup(opts)
         self.set_options()
         self.set_importer()
+        self.set_exporter()
         self.set_transmuters()
 
     def set_options(self) -> None:
         self.input_files = self.options.input_file
+        self.output = self.options.output
 
     def set_importer(self, importer: ImporterHandler | None = None) -> None:
         self.importer = importer or self.options.importer
@@ -39,6 +43,10 @@ class Scriptorium:
             transmuters = [transmuters]
         self.transmuters = transmuters
 
+    def set_exporter(self, exporter: ExporterHandler | None = None) -> None:
+        self.exporter = exporter or self.options.exporter
+        self.exporter.set_options(self.options)
+
     def load_data(self) -> Document:
         self.importer.load_data(self.input_files)
         self.document = self.importer.generate_document()
@@ -49,14 +57,9 @@ class Scriptorium:
         for transmuter in self.transmuters:
             transmuter.transmute(document)
 
-    def synthesize_transmutation(self):
-        raise NotImplementedError
+    def export(self, document: Document | None = None) -> Path:
+        document = self.document if not document else document
+        return self.exporter.export(document, self.options.output)
 
     def validate_output(self) -> None:
-        raise NotImplementedError
-
-    def export(self):
-        raise NotImplementedError
-
-    def collect_transmuters(self, type: TransmuterHandler):
         raise NotImplementedError
