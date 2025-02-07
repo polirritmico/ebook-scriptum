@@ -31,6 +31,7 @@ class TransmuterHandler(Protocol):
     generic_response_validator: ResponseValidator
 
     def set_model(self, model: ModelHandler) -> None: ...
+
     def transmute(self, document: Document) -> None: ...
 
 
@@ -39,4 +40,12 @@ class ImporterHandler(Protocol):
     source: Path | None = None
 
     def load_data(self, source: Path) -> None: ...
+
     def generate_document(self) -> Document: ...
+
+
+@runtime_checkable
+class ExporterHandler(Protocol):
+    def set_options(self, config) -> None: ...
+
+    def export(self, document: Document, output: Path) -> None: ...
