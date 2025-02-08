@@ -46,14 +46,29 @@ class EpubExporter:
     #     return (dir, file)
 
     def export_with_base_document(self, document: Document, output: Path) -> None:
+        # self.update_epub_metadata()
         with TemporaryDirectory(prefix=self.tmp_prefix) as temp_path_str:
             tmp_path = Path(temp_path_str)
             self.extract_epub(document.source, tmp_path)
-            # self.update_epub_sections()
-            # self.update_epub_metadata()
-            self.write_epub(output, tmp_path)
+            self.update_epub_section_files(document, tmp_path)
+            self.write_epub(document, tmp_path)
 
-    def write_epub(self, output: str, source_dir: Path) -> None:
+    def update_epub_section_files(self, document: Document, tmp_dir: Path) -> None:
+        for file, section in document.sections.items():
+            new_content = document.get_content(file)
+            target_path = self.unziped_target_path(section.filepath, tmp_dir)
+            try:
+                with open(target_path, "w", encoding="utf-8") as stream:
+                    stream.write(new_content)
+            except Exception:
+                raise Exception(f"Error writing the file '{file}'")
+
+    def unziped_target_path(self, section: Path, zip_dir: Path) -> Path:
+        old_tmp_dir_root = section.parts.index("OEBPS")
+        target_path = zip_dir / Path(*section.parts[old_tmp_dir_root:])
+        return target_path
+
+    def write_epub(self, output: Path, source_dir: Path) -> None:
         if not any(source_dir.iterdir()):
             raise FileNotFoundError(f"Can't access temp directory '{source_dir}'")
 
@@ -101,9 +116,6 @@ class EpubExporter:
 
         with ZipFile(source, "r") as stream:
             stream.extractall(target_path)
-
-    def update_epub_sections(self) -> None:
-        raise NotImplementedError
 
     def update_epub_metadata(self) -> None:
         raise NotImplementedError
