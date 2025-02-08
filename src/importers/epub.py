@@ -61,7 +61,7 @@ class EpubImporter:
             section_metadata = Section(
                 content=content,
                 title=self.get_section_title(content),
-                filepath=filepath,
+                filepath=self.get_section_inzip_path(filepath),
                 lang=self.get_section_lang(content),
                 order=order,
                 text=content.get_text(separator="\n"),
@@ -70,6 +70,11 @@ class EpubImporter:
 
         self.parsed_sections = sections
         return sections
+
+    def get_section_inzip_path(self, path: Path) -> Path:
+        root_index = path.parts.index("OEBPS")
+        inzip_path = Path(*path.parts[root_index:])
+        return inzip_path
 
     def get_section_lang(self, content: BeautifulSoup) -> str:
         lang = content.html.get("xml:lang")
