@@ -4,7 +4,7 @@
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
+from zipfile import ZipFile
 
 from bs4 import BeautifulSoup
 
