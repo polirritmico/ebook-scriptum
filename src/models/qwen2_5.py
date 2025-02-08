@@ -12,7 +12,7 @@ class ModelQwen:
 
     id: str = "qwen2.5:latest"  # :14b or latest
     base_instruction: str = (
-        "Translate from English to Spanish. Use correct Spanish punctuation and grammar. "
+        "Translate from English to Spanish. Keep html tags. Use correct Spanish punctuation and grammar. "
         "Provide only the translated text without any additions. "
         "Focus exclusively on translating the given content text and ensure your response contains only the translation. "
         "Any extra text, beyond the translated text, would result in a poor response:"
