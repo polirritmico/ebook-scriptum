@@ -63,35 +63,6 @@ class EpubExporter:
                 else:
                     zip.write(str(file), str(inzip_path))
 
-    def collect_files_data(self) -> None:
-        if self.metadata_file is None or self.text_files is None:
-            raise ValueError("Not collected files. Try load_data() first.")
-
-        self.text_files_content = {}
-        for file in self.text_files:
-            with open(file, "r", encoding="utf-8") as stream:
-                raw_data = stream.read()
-                self.text_files_content[file] = raw_data
-
-        with open(self.metadata_file, "r", encoding="utf-8") as stream:
-            raw_data = stream.read()
-            self.metadata_file_content = raw_data
-
-    def collect_metadata_and_text_files(self, path: Path) -> (list[str], str):
-        text_files, metadata = [], []
-        metadata_file = "content.opf"
-        text_suffixes = {".xhtml", ".html"}
-
-        for entry in path.rglob("*"):
-            if entry.name == metadata_file:
-                metadata = entry
-            elif entry.suffix in text_suffixes:
-                text_files.append(entry)
-
-        self.text_files = text_files
-        self.metadata_file = metadata
-        return text_files, metadata
-
     def extract_epub(self, source: Path, target_path: Path) -> None:
         if any(element.is_dir() for element in target_path.iterdir()):
             raise FileExistsError(f"The epub extract dir is not empty: '{target_path}'")
