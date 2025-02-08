@@ -12,6 +12,16 @@ class Document:
         self.sections: dict[str, Section] | None = None
         self.source: Path | None = None
 
+    def get_content(self, section_name: str, raw: bool = False) -> str:
+        section = self.sections.get(section_name, None)
+        if not section:
+            raise KeyError(f"Missing section from the document: {section_name}")
+
+        if raw:
+            return section.content.get_text()
+        else:
+            return section.content.prettify()
+
     def set_medatada(self, metadata: DocumentMetadata) -> None:
         self.validate_document_metadata(metadata)
         self.metadata = metadata
