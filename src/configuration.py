@@ -136,14 +136,16 @@ class ScriptoriumConfiguration:
         for key, spec in self.config_spec.items():
             valid_types = spec.get("types")
             opt_value_type = type(opts.get(key))
-            if opt_value_type not in valid_types:
-                opt_value_type = opt_value_type.__name__
-                expected_types = ", ".join(_type.__name__ for _type in valid_types)
-                err = (
-                    f"  - Key '{key}' has incorrect type: found '{opt_value_type}', "
-                    f"but '{expected_types}' is required"
-                )
-                detected_type_mismatches.append(err)
+            if any(issubclass(opt_value_type, valid) for valid in valid_types):
+                continue
+
+            opt_value_type = opt_value_type.__name__
+            expected_types = ", ".join(_type.__name__ for _type in valid_types)
+            err = (
+                f"  - Key '{key}' has incorrect type: found '{opt_value_type}', "
+                f"but '{expected_types}' is required"
+            )
+            detected_type_mismatches.append(err)
 
         return detected_type_mismatches
 
