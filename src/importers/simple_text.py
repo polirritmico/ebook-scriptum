@@ -82,7 +82,7 @@ class SimpleTextImporter:
         return title, creator
 
     def build_sections(self) -> dict[str, Section]:
-        soup = BeautifulSoup(self.content, "html.parser")
+        soup = self.make_html_soup()
         section = Section(
             content=soup,
             title=self.metadata.title,
@@ -91,7 +91,25 @@ class SimpleTextImporter:
             order=0,
             text=self.content,
         )
+
         return {self.source.name: section}
+
+    def make_html_soup(self) -> BeautifulSoup:
+        soup = BeautifulSoup(features="html.parser")
+        html = soup.new_tag("html")
+        soup.append(html)
+        body = soup.new_tag("body")
+        html.append(body)
+
+        content = self.content.split("\n")
+        for raw_line in content:
+            line = raw_line.strip()
+            if line:
+                p = soup.new_tag("p")
+                p.string = line
+                body.append(p)
+
+        return soup
 
     def infer_content_lang(self, content: str | None = None) -> str:
         content = content if content else self.content
