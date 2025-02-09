@@ -15,7 +15,7 @@ from src.protocols import (
 )
 
 
-class CatalystCollector:
+class Collector:
     IMPORTERS_SOURCE_PATH = "src.importers"
     EXPORTERS_SOURCE_PATH = "src.exporters"
     MODELS_SOURCE_PATH = "src.models"

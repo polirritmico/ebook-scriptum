@@ -4,7 +4,7 @@
 from pathlib import Path
 from typing import Tuple
 
-from src.catalyst_collector import CatalystCollector
+from src.collector import Collector
 from src.protocols import (
     ExporterHandler,
     ImporterHandler,
@@ -33,7 +33,7 @@ class ScriptoriumConfiguration:
         self.transmuters: list[TransmuterHandler] | None = None
         self.transmuters_types: TransmutersWithModel | None = None
 
-        self.collector = CatalystCollector()
+        self.collector = Collector()
 
     def setup(self, opts: dict | str | Path) -> "ScriptoriumConfiguration":
         opts = self.set_options(opts)
