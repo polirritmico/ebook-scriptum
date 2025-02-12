@@ -18,6 +18,19 @@ type ResponseValidator = Callable[["ModelHandler", Any, Any], bool]
 
 @runtime_checkable
 class ModelHandler(Protocol):
+    """
+    ModelHandler Protocol. This class is used by the `TransmuterHandler` and
+    allows implementing multiple models to the same handler if is compatible
+    (share the same `TransmuterType`).
+
+    :param id: <Model name>:<Tag>. For example: `"deepseek:latest"`.
+    :param transmuter_type: TransmuterType enum. (LLM or TTS)
+    :param response_validator: `ResponseValidator` function. If is `None` the
+        `TransmuterHandler` would use its generic validator.
+    :param make_instructions: Function to generate the instructions passed to
+        the IA service by the `TransmuterHandler`.
+    """
+
     id: str  # <name>:<tag>
     transmuter_type: TransmuterType
     response_validator: ResponseValidator | None
