@@ -3,7 +3,7 @@
 
 from src.collector import Collector
 from src.importers.epub import EpubImporter
-from src.transmuters.translator import Translator
+from src.transmuters.ollama_translator import OllamaTranslator
 
 
 def test_collect_model() -> None:
@@ -31,9 +31,9 @@ def test_collect_config_in_directory() -> None:
 
 
 def test_load_transmuter_from_config_json() -> None:
-    case_name = "Translator"
+    case_name = "OllamaTranslator"
     case_path = "src.transmuters"
-    expected = Translator
+    expected = OllamaTranslator
 
     collector = Collector()
     output = collector.collect_handler(case_name, case_path)

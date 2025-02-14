@@ -7,20 +7,20 @@ from src.configuration import ScriptoriumConfiguration
 from src.importers.simple_text import SimpleTextImporter
 from src.models.llama3_2 import ModelLlama3_2
 from src.protocols import ImporterHandler, ModelHandler
-from src.transmuters.translator import Translator
+from src.transmuters.ollama_translator import OllamaTranslator
 
 
 def test_transmuter_and_importer_not_overwriten_by_config() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/mock.epub",
-        "transmuters": {"Translator": ""},
+        "transmuters": {"OllamaTranslator": ""},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
 
     case_importer = SimpleTextImporter()
-    case_transmuter = Translator()
+    case_transmuter = OllamaTranslator()
     case_model = ModelLlama3_2()
     case_transmuter.set_model(case_model)
 
@@ -42,7 +42,7 @@ def test_load_config_json() -> None:
     expected_lang = "es"
     expected_input = "tests/files/simple.txt"
     ExpectedImporter = SimpleTextImporter
-    ExpectedTransmuter = Translator
+    ExpectedTransmuter = OllamaTranslator
     ExpectedModel = ModelHandler
 
     config = ScriptoriumConfiguration()
@@ -60,7 +60,7 @@ def test_minimal_keys_check_ok() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"Translator": ""},
+        "transmuters": {"OllamaTranslator": ""},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -71,7 +71,7 @@ def test_minimal_keys_check_ok() -> None:
 def test_minimal_keys_check_missing_input() -> None:
     case = {
         "output": "tests/files/output",
-        "transmuters": {"Translator": ""},
+        "transmuters": {"OllamaTranslator": ""},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -89,7 +89,7 @@ def test_detect_opts_mismatch_types_with_spec() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"Translator": ""},
+        "transmuters": {"OllamaTranslator": ""},
         "importer": ["EpubImporter"],  # this should not be a list
         "exporter": "EpubExporter",
     }
@@ -108,7 +108,7 @@ def test_parse_opts() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"Translator": ""},
+        "transmuters": {"OllamaTranslator": ""},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -126,7 +126,7 @@ def test_parse_opts_model() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"Translator": "ModelLlama3_2"},
+        "transmuters": {"OllamaTranslator": "ModelLlama3_2"},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }

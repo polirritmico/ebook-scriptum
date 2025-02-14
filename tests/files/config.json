@@ -1,0 +1,14 @@
+{
+  "input": "tests/files/simple.txt",
+  "output": "target_path",
+  "importer": "SimpleTextImporter",
+  "exporter": "EpubExporter",
+  "transmuters": {
+    "OllamaTranslator": "ModelLlama3_2"
+  },
+  "metadata": {
+    "title": "Archivo de prueba",
+    "creator": "Anónimo",
+    "lang": "es"
+  }
+}

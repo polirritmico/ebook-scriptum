@@ -7,7 +7,7 @@ from pathlib import Path
 from src.document import Document
 
 # TODO: Implement
-from src.models.vitts import VittsModel as DefaultModel
+from src.models.vitts import ModelVitts as DefaultModel
 from src.protocols import ModelHandler, TransmuterType
 
 # from TTS.api import TTS
@@ -15,7 +15,7 @@ from src.protocols import ModelHandler, TransmuterType
 # from word_dict import word_dict
 
 
-class TtsTransmuter:
+class CoquiTTS:
     transmuter_type: TransmuterType = TransmuterType.TTS
 
     def __init__(self):

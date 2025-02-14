@@ -8,7 +8,7 @@ def main():
     opts = {
         "input": "source_text",  # dir or file
         "input_handler": "SimpleTextImporter",
-        "transmuters": ["Translator"],
+        "transmuters": ["OllamaTranslator"],
         "output": "default_output",  # output dir
         "title": "Archivo de prueba",
         "creator": "Anónimo",

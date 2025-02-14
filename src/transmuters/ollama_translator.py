@@ -12,7 +12,7 @@ from src.models.qwen2_5 import ModelQwen as DefaultModel
 from src.protocols import ModelHandler, TransmuterType
 
 
-class Translator:
+class OllamaTranslator:
     """A TransmuterHandler subscriptor
 
     ollama docs at https://github.com/ollama/ollama-python

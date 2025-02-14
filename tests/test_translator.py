@@ -4,12 +4,12 @@
 import pytest
 
 from src.models.llama3_2 import ModelLlama3_2
-from src.transmuters.translator import Translator
+from src.transmuters.ollama_translator import OllamaTranslator
 
 
 @pytest.fixture
 def translator() -> None:
-    translator = Translator()
+    translator = OllamaTranslator()
     translator.set_model(None)
     return translator
 
@@ -18,7 +18,7 @@ def test_ollama_basic_translation() -> None:
     case = "Hello, World!"
     expected = ["hola", "mundo", "!"]
 
-    translator = Translator()
+    translator = OllamaTranslator()
     translator.set_model(ModelLlama3_2())
     output = translator.translate_text(case)
 

@@ -12,7 +12,7 @@ def test_simple_text_export() -> None:
     case = {
         "input": "tests/files/simple-translation.txt",
         "output": case_output_path,
-        "transmuters": {"Translator": ""},
+        "transmuters": {"OllamaTranslator": ""},
         "importer": "SimpleTextImporter",
         "exporter": "SimpleTextExporter",
     }
