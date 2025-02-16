@@ -74,8 +74,12 @@ class ScriptoriumConfiguration:
             self.transmuters = instantiated_transmuters
 
     def parse_non_handlers(self, opts: dict) -> None:
-        self.input_file = Path(opts.get("input"))
-        self.check_file(self.input_file)
+        opts_input = opts.get("input")
+        if not isinstance(opts_input, list):
+            opts_input = [opts_input]
+        self.input_file = [Path(filepath) for filepath in opts_input]
+
+        self.check_files(self.input_file)
         self.output = Path(opts.get("output"))
         if self.output.is_dir():
             self.check_dir(self.output)
@@ -176,6 +180,7 @@ class ScriptoriumConfiguration:
             # 755 owner|group|others, 7: read+write+execute; 5: read+execute
             dir.mkdir(mode=0o755, parents=True)
 
-    def check_file(self, file: Path) -> None:
-        if not file.exists():
-            raise ValueError(f"File does not exists: '{file}'")
+    def check_files(self, files: list[Path]) -> None:
+        for file in files:
+            if not file.exists():
+                raise ValueError(f"File does not exists: '{file}'")

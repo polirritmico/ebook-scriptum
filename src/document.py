@@ -28,10 +28,12 @@ class Document:
         self.source = metadata.source
 
     def set_sections(self, sections: dict[str, Section]) -> None:
+        # TODO: Add support for multiple sections
         self.validate_sections(sections)
         self.sections = sections
 
     def validate_sections(self, sections: dict[str, Section]) -> None:
+        # TODO: Add support for multiple sections
         if not sections:
             raise ValueError("Missing sections")
         elif not isinstance(sections, dict):

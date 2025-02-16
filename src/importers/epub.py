@@ -13,7 +13,7 @@ from src.document import Document
 
 
 class EpubImporter:
-    source: Path | None = None
+    sources: list[Path] | None = None
 
     def __init__(self):
         self.text_files = None
@@ -22,15 +22,19 @@ class EpubImporter:
         self.metadata_file_content = None
         self.parsed_sections = None
         self.temp_path = None
-        self.source = None
+        self.sources = None
 
-    def load_data(self, source: Path) -> None:
+    def load_data(self, sources: list[Path]) -> None:
+        if len(sources) > 1:
+            raise NotImplemented("Not implement support for multiple epubs")
+
+        source = sources[0]
         if not source:
             raise ValueError("load_data: Empty source path")
         if not isinstance(source, Path):
             raise TypeError(f"source should be a Path object: {type(source)}")
 
-        self.source = source
+        self.sources = [source]
         with TemporaryDirectory(prefix="scriptum_") as tmpdir:
             tmp_path = Path(tmpdir)
             self.extract_epub(source, tmp_path)
@@ -102,7 +106,7 @@ class EpubImporter:
             creator=self.get_text_from_soup_tag("dc:creator", soup),
             lang=self.get_text_from_soup_tag("dc:language", soup),
             description=self.get_text_from_soup_tag("dc:description", soup),
-            source=self.source,
+            source=self.sources,
             spine=self.get_sections_in_order_from_soup(soup),
         )
 

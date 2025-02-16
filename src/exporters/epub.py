@@ -27,7 +27,10 @@ class EpubExporter:
             self.output = config.output
 
     def export(self, document: Document, output: Path) -> None:
-        if document.source and document.source.exists():
+        if len(document.source) > 1:
+            raise NotImplementedError("Not implemented export for more than 1 epub")
+        source = document.source[0]
+        if source and source.exists():
             self.export_with_base_document(document, output)
         else:
             self.export_new_epub(document, output)
@@ -63,7 +66,11 @@ class EpubExporter:
                 else:
                     zip.write(str(file), str(inzip_path))
 
-    def extract_epub(self, source: Path, target_path: Path) -> None:
+    def extract_epub(self, source: list[Path], target_path: Path) -> None:
+        if len(source) > 1:
+            raise NotImplementedError("Not implemented support for more than 1 epub")
+        source = source[0]
+
         if any(element.is_dir() for element in target_path.iterdir()):
             raise FileExistsError(f"The epub extract dir is not empty: '{target_path}'")
 

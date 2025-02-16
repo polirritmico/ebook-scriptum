@@ -19,21 +19,24 @@ class SimpleTextImporter:
     """
 
     def __init__(self):
-        self.source: Path | None = None
-        self.content: str | None = None
-        self.metadata: DocumentMetadata | None = None
+        self.sources: list[Path] = None
+        self.content: list[str] = []
+        self.metadata: list[DocumentMetadata] | None = None
 
     # TODO: add support for dirs
-    def load_data(self, source: Path) -> None:
-        if not source:
+    def load_data(self, sources: list[Path]) -> None:
+        if not sources:
             raise ValueError("Missing source")
-        self.source = source
-        try:
-            encoding = self.detect_encoding(source)
-            content = source.read_text(encoding=encoding)
-            self.content = content
-        except Exception as e:
-            raise Exception(f"Error reading the file {source}: \n{e}")
+        if len(sources) > 1:
+            raise NotImplementedError("Not implemented support for multiple files")
+        for source in sources:
+            try:
+                encoding = self.detect_encoding(source)
+                content = source.read_text(encoding=encoding)
+                self.content.append(content)
+            except Exception as e:
+                raise Exception(f"Error reading the file {source}: \n{e}")
+        self.sources = sources
 
     def generate_document(self) -> Document:
         if not self.content:
@@ -44,6 +47,7 @@ class SimpleTextImporter:
         sections = self.build_sections()
 
         document.set_medatada(metadata)
+        # TODO: Add functionality to handle multiple files
         document.set_sections(sections)
         return document
 
@@ -52,7 +56,8 @@ class SimpleTextImporter:
         if not self.content:
             raise ValueError("Empty content. Try load_data() first.")
 
-        title, creator = self.get_creator_and_title_from_filename(self.source)
+        # TODO: Handle multiple files
+        title, creator = self.get_creator_and_title_from_filename(self.sources[0])
         description = f"'{title}' by {creator}."
         lang_code = self.infer_content_lang()
 
@@ -61,7 +66,8 @@ class SimpleTextImporter:
             creator=creator,
             lang=lang_code,
             description=description,
-            source=self.source,
+            # TODO: Add support for multiple files
+            source=self.sources[0],
         )
         self.metadata = metadata
         return metadata
@@ -70,7 +76,9 @@ class SimpleTextImporter:
         """Return (title, creator) extracted from the given filename."""
 
         # source -> <author> - <title>
-        clean_filename: str = self.source.stem.replace("_", " ")
+        # TODO: Add support for multiple files
+        source = source if source else self.sources[0]
+        clean_filename: str = source.stem.replace("_", " ")
         parsed_filename: list[str] = clean_filename.split(" - ")
         if len(parsed_filename) > 1:
             creator = parsed_filename[0]
@@ -86,13 +94,14 @@ class SimpleTextImporter:
         section = Section(
             content=soup,
             title=self.metadata.title,
-            filepath=self.source,
+            filepath=self.sources,
             lang=self.metadata.lang,
             order=0,
             text=self.content,
         )
 
-        return {self.source.name: section}
+        # TODO: Add support for multiple sources files
+        return {self.sources[0].name: section}
 
     def make_html_soup(self) -> BeautifulSoup:
         soup = BeautifulSoup(features="html.parser")
@@ -101,7 +110,8 @@ class SimpleTextImporter:
         body = soup.new_tag("body")
         html.append(body)
 
-        content = self.content.split("\n")
+        # TODO: Add support for multiple content files
+        content = self.content[0].split("\n")
         for raw_line in content:
             line = raw_line.strip()
             if line:
@@ -112,7 +122,8 @@ class SimpleTextImporter:
         return soup
 
     def infer_content_lang(self, content: str | None = None) -> str:
-        content = content if content else self.content
+        # TODO: Add support for multiple content files
+        content = content if content else self.content[0]
         if not content:
             raise ValueError("Missing content. Try load_data first")
 
