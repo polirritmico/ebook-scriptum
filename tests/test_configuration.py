@@ -40,7 +40,7 @@ def test_transmuter_and_importer_not_overwriten_by_config() -> None:
 def test_load_config_json() -> None:
     case = "tests/files/config.json"
     expected_lang = "es"
-    expected_input = "tests/files/simple.txt"
+    expected_input = ["tests/files/simple.txt"]
     ExpectedImporter = SimpleTextImporter
     ExpectedTransmuter = OllamaTranslator
     ExpectedModel = ModelHandler
@@ -49,7 +49,8 @@ def test_load_config_json() -> None:
     case = config.set_options(case)
     config.parse_options(case)
 
-    assert expected_input == config.input_file.as_posix()
+    for expected, output in zip(expected_input, config.input_file):
+        assert expected == output.as_posix()
     assert expected_lang == config.metadata["lang"]
     assert isinstance(config.importer, ExpectedImporter)
     assert isinstance(config.transmuters[0], ExpectedTransmuter)

@@ -8,7 +8,7 @@ from src.importers.epub import EpubImporter
 
 
 def test_export_epub() -> None:
-    case = Path("tests/files/simple_ebook.epub")
+    case = [Path("tests/files/simple_ebook.epub")]
     output_path = "tests/files/outputs/test_export_epub"
 
     importer = EpubImporter()
@@ -21,8 +21,8 @@ def test_export_epub() -> None:
 def test_update_epub_section() -> None:
     case = "THIS IS WORKING"
     expected = "THIS IS WORKING"
-    case_input = Path("tests/files/simple_ebook.epub")
-    case_output = Path("tests/files/outputs/test_update_epub_section.epub")
+    case_input = [Path("tests/files/simple_ebook.epub")]
+    case_output = [Path("tests/files/outputs/test_update_epub_section.epub")]
 
     prev_importer = EpubImporter()
     prev_importer.load_data(case_input)
@@ -32,7 +32,7 @@ def test_update_epub_section() -> None:
     assert case == prev_section.content.find("p").string
 
     exporter = EpubExporter()
-    exporter.export(prev_document, case_output)
+    exporter.export(prev_document, case_output[0])
 
     after_importer = EpubImporter()
     after_importer.load_data(case_output)

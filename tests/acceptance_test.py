@@ -18,7 +18,7 @@ def tmp_dir():
 
 
 def test_epub_importer_handler_protocol_compliance() -> None:
-    case_file = Path("tests/files/simple_ebook.epub")
+    case_file = [Path("tests/files/simple_ebook.epub")]
 
     epub = EpubImporter()
     epub.load_data(case_file)

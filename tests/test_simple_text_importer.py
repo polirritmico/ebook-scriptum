@@ -3,8 +3,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from src.importers.simple_text import SimpleTextImporter
 
 
@@ -13,7 +11,7 @@ def test_read_file() -> None:
     expected = "En un lugar de la Mancha, de cuyo nombre no quiero acordarme"
 
     importer = SimpleTextImporter()
-    importer.load_data(case)
+    importer.load_data([case])
     output = importer.generate_document()
 
     assert output.metadata.lang
@@ -25,16 +23,16 @@ def test_read_file() -> None:
     assert case.name in output.sections
 
     assert output.sections[case.name].content
-    assert expected in output.sections[case.name].text
+    assert expected in output.sections[case.name].text[0]
 
 
 def test_build_metadata() -> None:
-    case = Path("tests/files/Author_Name_-_Some_Title.txt")
+    case = [Path("tests/files/Author_Name_-_Some_Title.txt")]
     expected_lang = "es"
     expected_title = "Some Title"
     expected_creator = "Author Name"
     expected_description = "'Some Title' by Author Name."
-    expected_source = case
+    expected_source = case[0]
 
     importer = SimpleTextImporter()
     importer.load_data(case)
