@@ -17,7 +17,7 @@ type TransmutersWithModel = list[Tuple[TransmuterHandler, ModelHandler]]
 
 class ScriptoriumConfiguration:
     config_spec = {
-        "input": {"types": (str, Path), "mandatory": True},
+        "input": {"types": (str, Path, list), "mandatory": True},
         "output": {"types": (str, Path), "mandatory": False},
         "importer": {"types": (str,), "mandatory": True},
         "exporter": {"types": (str,), "mandatory": True},
@@ -27,7 +27,7 @@ class ScriptoriumConfiguration:
     def __init__(self) -> None:
         self.importer: ImporterHandler | None = None
         self.exporter: ExporterHandler | None = None
-        self.input_file: Path | None = None
+        self.input_file: list[Path] | None = None
         self.output: Path | None = None
         self.raw_opts: dict | None = None
         self.transmuters: list[TransmuterHandler] | None = None
