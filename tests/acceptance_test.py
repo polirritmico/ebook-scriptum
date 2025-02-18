@@ -43,3 +43,18 @@ def test_translate_full_ebook(tmp_dir) -> None:
     scriptum.transmute()
     # scriptum.validate_output()
     scriptum.export()
+
+
+def test_epub_to_txt() -> None:
+    case = {
+        "input": "tests/files/simple_ebook.epub",
+        "output": "output.txt",
+        "transmuters": {"DummyTransmuter": ""},
+        "importer": "EpubImporter",
+        "exporter": "SimpleTextExporter",
+    }
+
+    scriptum = Scriptorium()
+    scriptum.setup(case)
+    scriptum.load_data()
+    scriptum.export()
