@@ -11,8 +11,7 @@ class ModelVitts:
     transmuter_type: TransmuterType = TransmuterType.TTS
 
     id: str = "vitts:latest"  # :14b or latest
-    # TODO: str | dict?
-    base_instruction: str = ""
+    base_instruction: dict = {}
     tag: str = "vitts"
 
     def __init__(self, id: str | None = None, instruction: str | None = None):
