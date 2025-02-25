@@ -50,9 +50,10 @@ class TransmuterHandler(Protocol):
 
 @runtime_checkable
 class ImporterHandler(Protocol):
-    sources: list[Path] | None = None
+    sources: Path | None = None
 
-    def load_data(self, sources: list[Path]) -> None: ...
+    # TODO: Update
+    def load_data(self, sources: Path | list[Path]) -> None: ...
 
     def generate_document(self) -> Document: ...
 
