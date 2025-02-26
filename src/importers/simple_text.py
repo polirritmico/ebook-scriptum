@@ -24,9 +24,12 @@ class SimpleTextImporter:
         self.metadata: list[DocumentMetadata] | None = None
 
     # TODO: add support for dirs
-    def load_data(self, sources: list[Path]) -> None:
+    def load_data(self, sources: Path | list[Path]) -> None:
         if not sources:
             raise ValueError("Missing source")
+        if isinstance(sources, Path):
+            sources = [sources]
+
         if len(sources) > 1:
             raise NotImplementedError("Not implemented support for multiple files")
         for source in sources:
