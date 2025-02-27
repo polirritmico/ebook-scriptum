@@ -10,10 +10,6 @@ from src.document import Document
 from src.models.vitts import ModelVitts as DefaultModel
 from src.protocols import ModelHandler, TransmuterType
 
-# from TTS.api import TTS
-# from text_processor import text_processor
-# from word_dict import word_dict
-
 
 class CoquiTTS:
     transmuter_type: TransmuterType = TransmuterType.TTS
@@ -69,7 +65,7 @@ class CoquiTTS:
         if self.lang_model:
             tts_opts["lang"] = self.lang_model
 
-        tts.tts_to_file(**tts_opts)
+        self.tts.tts_to_file(**tts_opts)
         return self.output_path
 
     # def process_file(file_path: str, output_file: str, opts):
