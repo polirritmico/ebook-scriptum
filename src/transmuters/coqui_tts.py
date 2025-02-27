@@ -5,8 +5,6 @@
 from pathlib import Path
 
 from src.document import Document
-
-# TODO: Implement
 from src.models.vitts import ModelVitts as DefaultModel
 from src.protocols import ModelHandler, TransmuterType
 
@@ -29,6 +27,7 @@ class CoquiTTS:
 
         self.tts = None
         self.device = "cuda"
+        self.opts = {}
 
     def generic_response_validator(self, response: str | None, original: str) -> bool:
         return True
@@ -48,21 +47,24 @@ class CoquiTTS:
         return processed_document
 
     def transmute(self, document: Document) -> None:
-        processed_document = self.process_text(document)
+        # processed_document = self.process_text(document)
+        self.opts["vocoder"] = "vocoder_models/universal/libri-tts/wavegrad"
+        self.output_path = "tests/files/outputs/tts_out.wav"
 
         self.tts = TTS(
             model_name=self.model.name, config_path=self.opts.get("config_path")
         ).to(self.device)
 
-        opts = {}
+        text = document.get_content("simple.txt", raw=True)
 
         tts_opts = {
             "file_path": self.output_path,
-            "text": document,
-            "speaker_wav": opts.get("speaker"),
-            "vocoder_name": opts.get("vocoder"),
+            "text": text,
+            "speaker_wav": self.opts.get("speaker"),
+            "vocoder_name": self.opts.get("vocoder"),
         }
-        if self.lang_model:
+
+        if hasattr(self, "lang_model") and self.lang_model:
             tts_opts["lang"] = self.lang_model
 
         self.tts.tts_to_file(**tts_opts)
