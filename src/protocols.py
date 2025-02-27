@@ -18,41 +18,17 @@ type ResponseValidator = Callable[["ModelHandler", Any, Any], bool]
 
 @runtime_checkable
 class ModelHandler(Protocol):
-    """
-    ModelHandler Protocol. This class is used by the `TransmuterHandler` and
-    allows implementing multiple models to the same handler if is compatible
-    (share the same `TransmuterType`).
-
-    :param id: <Model name>:<Tag>. For example: `"deepseek:latest"`.
-    :param transmuter_type: TransmuterType enum. (LLM or TTS)
-    :param response_validator: `ResponseValidator` function. If is `None` the
-        `TransmuterHandler` would use its generic validator.
-    :param make_instructions: Function to generate the instructions passed to
-        the IA service by the `TransmuterHandler`.
-    """
-
     id: str  # <name>:<tag>
-    transmuter_type: TransmuterType
+    transmuter_type: TransmuterType  # LLM, TTS
     response_validator: ResponseValidator | None
 
-    def make_instructions(self, content) -> Any: ...
-
-
-@runtime_checkable
-class TransmuterHandler(Protocol):
-    transmuter_type: TransmuterType
-    generic_response_validator: ResponseValidator
-
-    def set_model(self, model: ModelHandler) -> None: ...
-
-    def transmute(self, document: Document) -> None: ...
+    def prepare_request(self, opts: dict) -> Any: ...
 
 
 @runtime_checkable
 class ImporterHandler(Protocol):
-    sources: Path | None = None
+    sources: list[Path] | None = None
 
-    # TODO: Update
     def load_data(self, sources: Path | list[Path]) -> None: ...
 
     def generate_document(self) -> Document: ...
@@ -60,6 +36,21 @@ class ImporterHandler(Protocol):
 
 @runtime_checkable
 class ExporterHandler(Protocol):
-    def set_options(self, config) -> None: ...
+    def set_options(self, options: dict[str, Any]) -> None: ...
 
     def export(self, document: Document, output: Path) -> None: ...
+
+
+@runtime_checkable
+class TransmuterHandler(Protocol):
+    exporter: ExporterHandler | None
+    generic_response_validator: ResponseValidator
+    transmuter_type: TransmuterType
+
+    def set_model(self, model: ModelHandler) -> None: ...
+
+    def set_exporter(self, exporter: ExporterHandler) -> None: ...
+
+    def transmute(self, document: Document) -> None: ...
+
+    def export(self, path: Path) -> None: ...
