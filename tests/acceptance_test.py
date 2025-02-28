@@ -32,7 +32,7 @@ def test_translate_full_ebook(tmp_dir) -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output.epub",
-        "transmuter": {"OllamaTranslator": ""},
+        "transmuter": ("OllamaTranslator", ""),
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -49,7 +49,7 @@ def test_epub_to_txt() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "output.txt",
-        "transmuter": {"DummyTransmuter": ""},
+        "transmuter": ("DummyTransmuter", ""),
         "importer": "EpubImporter",
         "exporter": "SimpleTextExporter",
     }

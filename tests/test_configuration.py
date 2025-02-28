@@ -14,7 +14,7 @@ def test_transmuter_and_importer_not_overwriten_by_config() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/mock.epub",
-        "transmuter": {"OllamaTranslator": ""},
+        "transmuter": ("OllamaTranslator", ""),
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -127,7 +127,7 @@ def test_parse_opts_model() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuter": {"OllamaTranslator": "ModelLlama3_2"},
+        "transmuter": ("OllamaTranslator", "ModelLlama3_2"),
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
