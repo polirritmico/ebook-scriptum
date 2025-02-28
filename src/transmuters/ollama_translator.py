@@ -113,7 +113,8 @@ class OllamaTranslator:
             raise
 
     def send_prompt(self, text_to_translate: str = None) -> str:
-        msg = self.model.make_instructions(text_to_translate)
+        opts = {"content": text_to_translate}
+        msg = self.model.prepare_request(opts)
         response: ChatResponse = chat(**msg)
         response_text = self.get_text_from_response(response)
         return response_text
