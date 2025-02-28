@@ -21,7 +21,7 @@ class ScriptoriumConfiguration:
         "importer": {"types": (str,), "mandatory": True},
         "input": {"types": (str, Path, list), "mandatory": True},
         "output": {"types": (str, Path), "mandatory": False},
-        "transmuter": {"types": (str, tuple), "mandatory": True},
+        "transmuter": {"types": (str, tuple, list), "mandatory": True},
     }
 
     def __init__(self) -> None:
