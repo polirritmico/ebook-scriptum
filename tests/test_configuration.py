@@ -14,7 +14,7 @@ def test_transmuter_and_importer_not_overwriten_by_config() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/mock.epub",
-        "transmuters": {"OllamaTranslator": ""},
+        "transmuter": {"OllamaTranslator": ""},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -26,11 +26,11 @@ def test_transmuter_and_importer_not_overwriten_by_config() -> None:
 
     config = ScriptoriumConfiguration()
     config.importer = case_importer
-    config.transmuters = [case_transmuter]
+    config.transmuter = case_transmuter
 
     config.set_options(case)
     config.parse_options(case)
-    out_transmuter = config.transmuters[0]
+    out_transmuter = config.transmuter
 
     assert case_model is out_transmuter.model
     assert case_transmuter is out_transmuter
@@ -53,15 +53,15 @@ def test_load_config_json() -> None:
         assert expected == output.as_posix()
     assert expected_lang == config.metadata["lang"]
     assert isinstance(config.importer, ExpectedImporter)
-    assert isinstance(config.transmuters[0], ExpectedTransmuter)
-    assert isinstance(config.transmuters[0].model, ExpectedModel)
+    assert isinstance(config.transmuter, ExpectedTransmuter)
+    assert isinstance(config.transmuter.model, ExpectedModel)
 
 
 def test_minimal_keys_check_ok() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"OllamaTranslator": ""},
+        "transmuter": "OllamaTranslator",
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -72,7 +72,7 @@ def test_minimal_keys_check_ok() -> None:
 def test_minimal_keys_check_missing_input() -> None:
     case = {
         "output": "tests/files/output",
-        "transmuters": {"OllamaTranslator": ""},
+        "transmuter": "OllamaTranslator",
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -90,8 +90,8 @@ def test_detect_opts_mismatch_types_with_spec() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"OllamaTranslator": ""},
-        "importer": ["EpubImporter"],  # this should not be a list
+        "transmuter": "OllamaTranslator",
+        "importer": "EpubImporter",  # this should not be a list
         "exporter": "EpubExporter",
     }
     expected = ["type", "importer", "list", "str"]
@@ -109,7 +109,7 @@ def test_parse_opts() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"OllamaTranslator": ""},
+        "transmuter": "OllamaTranslator",
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -127,7 +127,7 @@ def test_parse_opts_model() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
-        "transmuters": {"OllamaTranslator": "ModelLlama3_2"},
+        "transmuter": {"OllamaTranslator": "ModelLlama3_2"},
         "importer": "EpubImporter",
         "exporter": "EpubExporter",
     }
@@ -136,8 +136,6 @@ def test_parse_opts_model() -> None:
     config = ScriptoriumConfiguration()
     config.parse_handlers(case)
 
-    assert config.transmuters_types
-    assert len(config.transmuters_types) == 1
-    first_transmuter_with_model = config.transmuters_types[0]
-    Model = first_transmuter_with_model[1]
-    assert Model is ExpectedType
+    assert config.transmuter_type
+    OutputModel = config.transmuter_type[1]
+    assert OutputModel is ExpectedType

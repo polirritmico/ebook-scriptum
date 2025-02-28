@@ -27,12 +27,12 @@ def test_collect_config_in_directory() -> None:
     assert expected_input == output.get("input")
     assert expected_lang == output_metadata.get("lang")
     assert output.get("importer")
-    assert output.get("transmuters")
+    assert output.get("transmuter")
 
 
 def test_load_transmuter_from_config_json() -> None:
     case_name = "OllamaTranslator"
-    case_path = "src.transmuters"
+    case_path = "src.transmuter"
     expected = OllamaTranslator
 
     collector = Collector()
