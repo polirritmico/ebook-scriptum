@@ -29,6 +29,8 @@ class ModelHandler(Protocol):
 class ImporterHandler(Protocol):
     sources: list[Path] | None = None
 
+    def set_options(self, options: dict[str, Any]) -> None: ...
+
     def load_data(self, sources: Path | list[Path]) -> None: ...
 
     def generate_document(self) -> Document: ...
@@ -46,6 +48,8 @@ class TransmuterHandler(Protocol):
     exporter: ExporterHandler | None
     generic_response_validator: ResponseValidator
     transmuter_type: TransmuterType
+
+    def set_options(self, options: dict[str, Any]) -> None: ...
 
     def set_model(self, model: ModelHandler) -> None: ...
 
