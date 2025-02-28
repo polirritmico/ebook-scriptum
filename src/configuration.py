@@ -21,7 +21,7 @@ class ScriptoriumConfiguration:
         "importer": {"types": (str,), "mandatory": True},
         "input": {"types": (str, Path, list), "mandatory": True},
         "output": {"types": (str, Path), "mandatory": False},
-        "transmuter": {"types": (str, dict), "mandatory": True},
+        "transmuter": {"types": (str, tuple), "mandatory": True},
     }
 
     def __init__(self) -> None:
@@ -125,7 +125,13 @@ class ScriptoriumConfiguration:
         return Exporter
 
     def get_transmuter_model_pairs(self, opts: dict) -> TransmuterWithModel:
-        transmuter_name, model_name = opts.get("transmuter")
+        raw_transmuter = opts.get("transmuter")
+        if isinstance(raw_transmuter, str):
+            transmuter_name = raw_transmuter
+            model_name = ""
+        else:
+            transmuter_name, model_name = raw_transmuter
+
         Transmuter = self.collector.collect_transmuter_handler(transmuter_name)
         Model = self.collector.collect_model_handler(model_name)
 
