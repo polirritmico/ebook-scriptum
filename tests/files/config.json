@@ -3,9 +3,9 @@
   "output": "target_path",
   "importer": "SimpleTextImporter",
   "exporter": "EpubExporter",
-  "transmuters": {
-    "OllamaTranslator": "ModelLlama3_2"
-  },
+  "transmuter": [
+    "OllamaTranslator", "ModelLlama3_2"
+  ],
   "metadata": {
     "title": "Archivo de prueba",
     "creator": "Anónimo",
