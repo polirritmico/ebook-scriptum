@@ -24,6 +24,9 @@ class EpubImporter:
         self.temp_path = None
         self.sources = None
 
+    def set_options(self, options: dict) -> None:
+        raise NotImplementedError()
+
     def load_data(self, sources: list[Path]) -> None:
         if len(sources) > 1:
             raise NotImplementedError("Not implement support for multiple epubs")
