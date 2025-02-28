@@ -88,6 +88,18 @@ class ScriptoriumConfiguration:
         if metadata:
             self.metadata = opts.get("metadata")
 
+        importer_opts = opts.get("importer_opts")
+        if importer_opts:
+            self.importer_opts = importer_opts
+
+        exporter_opts = opts.get("exporter_opts")
+        if exporter_opts:
+            self.exporter_opts = exporter_opts
+
+        transmuter_opts = opts.get("transmuter_opts")
+        if transmuter_opts:
+            self.transmuter_opts = transmuter_opts
+
     def parse_handlers(self, opts: dict) -> None:
         if not self.importer:
             self.importer = self.get_importer(opts)
@@ -95,8 +107,8 @@ class ScriptoriumConfiguration:
         if not self.exporter:
             self.exporter = self.get_exporter(opts)
 
-        if not self.transmuters:
-            self.transmuters_types = self.get_transmuter_model_pairs(opts)
+        if not self.transmuter:
+            self.transmuter_type = self.get_transmuter_model_pairs(opts)
 
     def get_importer(self, opts: dict) -> ImporterHandler:
         importer_name = opts.get("importer")
@@ -181,3 +193,12 @@ class ScriptoriumConfiguration:
         for file in files:
             if not file.exists():
                 raise ValueError(f"File does not exists: '{file}'")
+
+    def get_exporter_opts(self) -> dict | None:
+        return self.exporter_opts
+
+    def get_importer_opts(self) -> dict | None:
+        return self.importer_opts
+
+    def get_transmuter_opts(self) -> dict | None:
+        return self.transmuter_opts
