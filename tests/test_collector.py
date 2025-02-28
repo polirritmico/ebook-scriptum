@@ -32,7 +32,7 @@ def test_collect_config_in_directory() -> None:
 
 def test_load_transmuter_from_config_json() -> None:
     case_name = "OllamaTranslator"
-    case_path = "src.transmuter"
+    case_path = "src.transmuters"
     expected = OllamaTranslator
 
     collector = Collector()

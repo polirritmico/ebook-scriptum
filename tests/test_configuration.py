@@ -91,7 +91,7 @@ def test_detect_opts_mismatch_types_with_spec() -> None:
         "input": "tests/files/simple_ebook.epub",
         "output": "tests/files/output",
         "transmuter": "OllamaTranslator",
-        "importer": "EpubImporter",  # this should not be a list
+        "importer": ["EpubImporter"],  # this should not be a list
         "exporter": "EpubExporter",
     }
     expected = ["type", "importer", "list", "str"]
