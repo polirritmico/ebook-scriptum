@@ -12,16 +12,16 @@ from src.protocols import (
     TransmuterHandler,
 )
 
-type TransmutersWithModel = list[Tuple[TransmuterHandler, ModelHandler]]
+type TransmuterWithModel = Tuple[TransmuterHandler, ModelHandler]
 
 
 class ScriptoriumConfiguration:
     config_spec = {
+        "exporter": {"types": (str,), "mandatory": False},
+        "importer": {"types": (str,), "mandatory": True},
         "input": {"types": (str, Path, list), "mandatory": True},
         "output": {"types": (str, Path), "mandatory": False},
-        "importer": {"types": (str,), "mandatory": True},
-        "exporter": {"types": (str,), "mandatory": True},
-        "transmuters": {"types": (dict,), "mandatory": True},
+        "transmuter": {"types": (str, dict), "mandatory": True},
     }
 
     def __init__(self) -> None:
@@ -30,8 +30,11 @@ class ScriptoriumConfiguration:
         self.input_file: list[Path] | None = None
         self.output: Path | None = None
         self.raw_opts: dict | None = None
-        self.transmuters: list[TransmuterHandler] | None = None
-        self.transmuters_types: TransmutersWithModel | None = None
+        self.transmuter: list[TransmuterHandler] | None = None
+        self.transmuter_type: TransmuterWithModel | None = None
+        self.importer_opts: dict | None = None
+        self.transmuter_opts: dict | None = None
+        self.exporter_opts: dict | None = None
 
         self.collector = Collector()
 
@@ -64,14 +67,11 @@ class ScriptoriumConfiguration:
         if uninstantiated_exporter:
             self.exporter = self.exporter()
 
-        if self.transmuters_types:
-            instantiated_transmuters = []
-            for Transmuter, Model in self.transmuters_types:
-                model = Model() if Model is not None else None
-                transmuter = Transmuter()
-                transmuter.set_model(model)
-                instantiated_transmuters.append(transmuter)
-            self.transmuters = instantiated_transmuters
+        if self.transmuter_type:
+            Transmuter, Model = self.transmuter_type
+            model = Model() if Model is not None else None
+            self.transmuter = Transmuter()
+            self.transmuter.set_model(model)
 
     def parse_non_handlers(self, opts: dict) -> None:
         opts_input = opts.get("input")
@@ -112,18 +112,15 @@ class ScriptoriumConfiguration:
             raise ValueError("Missing exporter")
         return Exporter
 
-    def get_transmuter_model_pairs(self, opts: dict) -> TransmutersWithModel:
-        transmuters_names = opts.get("transmuters")
-        transmuters: TransmutersWithModel = []
-        for transmuter_name, model_name in transmuters_names.items():
-            Transmuter = self.collector.collect_transmuter_handler(transmuter_name)
-            Model = self.collector.collect_model_handler(model_name)
-            transmuters.append((Transmuter, Model))
+    def get_transmuter_model_pairs(self, opts: dict) -> TransmuterWithModel:
+        transmuter_name, model_name = opts.get("transmuter")
+        Transmuter = self.collector.collect_transmuter_handler(transmuter_name)
+        Model = self.collector.collect_model_handler(model_name)
 
-        if not transmuters:
+        if not Transmuter:
             raise ValueError("No transmuter has been loaded")
 
-        return transmuters
+        return (Transmuter, Model)
 
     def check_spec_compliance(self, opts: dict) -> None:
         missing_entries_err = self.check_input_opts_missing_entries(opts)

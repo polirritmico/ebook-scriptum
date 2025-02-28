@@ -13,8 +13,7 @@ class Scriptorium:
 
     def __init__(self):
         self.importer: ImporterHandler | None = None
-        self.exporter: ExporterHandler | None = None
-        self.transmuters: TransmuterHandler | list[TransmuterHandler] | None = None
+        self.transmuter: TransmuterHandler | None = None
         self.options: ScriptoriumConfiguration = ScriptoriumConfiguration()
         self.document: Document | None = None
         self.input_files: list[Path] | None = None
@@ -24,28 +23,37 @@ class Scriptorium:
         self.options.setup(opts)
         self.set_options()
         self.set_importer()
+        self.set_transmuter()
         self.set_exporter()
-        self.set_transmuters()
 
     def set_options(self) -> None:
         self.input_files = self.options.input_file
         self.output = self.options.output
 
+        importer_opts = self.options.get_importer_opts()
+        if importer_opts:
+            self.importer.set_options(importer_opts)
+
+        transmuter_opts = self.options.get_transmuter_opts()
+        if transmuter_opts:
+            self.transmuter.set_options(transmuter_opts)
+
+        exporter_opts = self.options.get_exporter_opts()
+        if exporter_opts and self.transmuter.exporter:
+            self.transmuter.exporter.set_options(exporter_opts)
+
     def set_importer(self, importer: ImporterHandler | None = None) -> None:
         self.importer = importer or self.options.importer
 
-    def set_transmuters(
-        self, transmuters: TransmuterHandler | list[TransmuterHandler] | None = None
-    ) -> None:
-        if transmuters is None:
-            transmuters = self.options.transmuters
-        elif not isinstance(transmuters, list):
-            transmuters = [transmuters]
-        self.transmuters = transmuters
+    def set_transmuter(self, transmuter: TransmuterHandler | None = None) -> None:
+        self.transmuter = transmuter or self.options.transmuter
 
     def set_exporter(self, exporter: ExporterHandler | None = None) -> None:
-        self.exporter = exporter or self.options.exporter
-        self.exporter.set_options(self.options)
+        exporter = exporter or self.options.exporter
+        if exporter is None:
+            return
+        exporter.set_options(self.options)
+        self.transmuter.set_exporter(exporter)
 
     def load_data(self) -> Document:
         self.importer.load_data(self.input_files)
@@ -54,12 +62,11 @@ class Scriptorium:
 
     def transmute(self, document: Document | None = None) -> None:
         document = document if document else self.document
-        for transmuter in self.transmuters:
-            transmuter.transmute(document)
+        self.transmuter.transmute(document)
 
     def export(self, document: Document | None = None) -> Path:
         document = self.document if not document else document
-        return self.exporter.export(document, self.options.output)
+        return self.transmuter.export(document, self.options.output)
 
     def validate_output(self) -> None:
         raise NotImplementedError

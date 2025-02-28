@@ -26,7 +26,7 @@ class EpubImporter:
 
     def load_data(self, sources: list[Path]) -> None:
         if len(sources) > 1:
-            raise NotImplemented("Not implement support for multiple epubs")
+            raise NotImplementedError("Not implement support for multiple epubs")
 
         source = sources[0]
         if not source:
