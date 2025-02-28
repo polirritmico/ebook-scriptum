@@ -32,7 +32,8 @@ class ModelQwen:
         self.id = id if id else self.id
         self.instruction = instruction if instruction else self.base_instruction
 
-    def make_instructions(self, content) -> Any:
+    def prepare_request(self, opts: dict) -> Any:
+        content = opts.get("content")
         return {
             "model": self.id,
             "messages": [

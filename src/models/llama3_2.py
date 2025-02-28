@@ -5,12 +5,6 @@ from typing import Any
 
 from src.protocols import TransmuterType
 
-# transmuter_type: TransmuterType
-# id: str
-#
-# def response_validator(self, response, request) -> bool: ...
-# def make_instructions(self, content) -> Any: ...
-
 
 class ModelLlama3_2:
     transmuter_type: TransmuterType = TransmuterType.LLM
@@ -31,9 +25,8 @@ class ModelLlama3_2:
         if instruction:
             self.instruction = instruction
 
-    def make_instructions(self, content) -> Any:
-        if not isinstance(content, str):
-            raise TypeError("content is not of type str")
+    def prepare_request(self, opts: dict) -> Any:
+        content = opts.get("content")
         return {
             "model": self.id,
             "messages": [

@@ -19,7 +19,7 @@ class ModelVitts:
         self.instruction = instruction if instruction else self.base_instruction
         self.name = "tts_models/es/css10/vits"
 
-    def make_instructions(self, content) -> Any:
+    def prepare_request(self, opts: dict) -> Any:
         pass
 
     def response_validator(self, response: str | None, original: str) -> bool:
