@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
 from typing import Callable
 
 from ollama import ChatResponse, chat
@@ -8,8 +9,9 @@ from ollama import list as ollama_list
 
 from src.dataclass import Section
 from src.document import Document
+from src.exporters.simple_text import SimpleTextExporter as DefaultExporter
 from src.models.qwen2_5 import ModelQwen as DefaultModel
-from src.protocols import ModelHandler, TransmuterType
+from src.protocols import ExporterHandler, ModelHandler, TransmuterType
 
 
 class OllamaTranslator:
@@ -23,9 +25,12 @@ class OllamaTranslator:
     response: ChatResponse
     run_validator: Callable[[str | None, str], bool]
     transmuter_type: TransmuterType = TransmuterType.LLM
+    exporter: ExporterHandler | None
 
     def __init__(self):
         self.translated_metadata: dict[str, str] = {}
+        self.document = None
+        self.exporter = None
         self.model = None
         self.response = None
         self.run_validator = None
@@ -53,12 +58,27 @@ class OllamaTranslator:
         else:
             self.run_validator = self.generic_response_validator
 
+    def set_exporter(self, exporter: ExporterHandler | None) -> None:
+        if not exporter or not isinstance(exporter, ExporterHandler):
+            exporter = DefaultExporter()
+        self.exporter = exporter
+
     def transmute(self, document: Document) -> None:
         self.check_ollama()
 
         for section_name, section in document.sections.items():
             self.translate_section_metadata(section)
             self.translate_section_content(section)
+
+        self.document = document
+
+    def export(self, path: Path) -> None:
+        if self.exporter is None:
+            raise ValueError("Missing exporter. Try set_exporter()")
+        if self.document is None:
+            raise ValueError("Missing transmuted document. Try transmute()")
+
+        self.exporter.export(self.document, path)
 
     def translate_section_metadata(self, section: Section) -> None:
         section.title = self.translate_metadata(section.title)

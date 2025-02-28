@@ -65,8 +65,7 @@ class Scriptorium:
         self.transmuter.transmute(document)
 
     def export(self, document: Document | None = None) -> Path:
-        document = self.document if not document else document
-        return self.transmuter.export(document, self.options.output)
+        return self.transmuter.export(self.options.output)
 
     def validate_output(self) -> None:
         raise NotImplementedError
