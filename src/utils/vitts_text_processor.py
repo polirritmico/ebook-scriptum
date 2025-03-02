@@ -8,7 +8,7 @@ from pathlib import Path
 from num2words import num2words
 
 
-class TtsTextProcessor:
+class VittsTextProcessor:
     DEFAULT_LANG = "en"
     LOG_DIR = "logs/processed_text/"
     SYMBOLS = {
@@ -91,7 +91,10 @@ class TtsTextProcessor:
             del text[line_to_remove]
 
     def process_text(
-        self, raw_text: str, replacement_dict: dict[str, str], opts: dict
+        self,
+        raw_text: str,
+        replacement_dict: dict[str, str] | None = None,
+        opts: dict | None = None,
     ) -> str:
         """
         Apply all text filters and processors to improve the str send to the TTS
@@ -120,7 +123,10 @@ class TtsTextProcessor:
         self.join_short_lines(processed, min_width=20)
         multiline_text = "\n\n".join(processed)
 
-        if opts.get("log"):
+        log = opts.get("log")
+        if log:
+            if not isinstance(log, str | Path):
+                log = self.LOG_DIR
             source_filename = opts.get("filename")
             self.store_generated_text(multiline_text, source_filename)
 
