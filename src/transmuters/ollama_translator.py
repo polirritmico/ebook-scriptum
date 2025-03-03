@@ -48,6 +48,9 @@ class OllamaTranslator:
             "span",
         ]
 
+    def set_options(self, options: dict) -> None:
+        raise NotImplementedError()
+
     def set_model(self, model: ModelHandler | None) -> None:
         if model and model.transmuter_type != self.transmuter_type:
             msg = f"ModelHandler {model.transmuter_type} incompatible with {self.transmuter_type}"
