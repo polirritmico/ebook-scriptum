@@ -40,8 +40,8 @@ class Collector:
         """Returns the class subscribed to the ModelHandler protocol (not the instance)"""
         if not name:
             return None
-        Importer = self.collect_handler(name, self.MODELS_SOURCE_PATH)
-        return Importer
+        Model = self.collect_handler(name, self.MODELS_SOURCE_PATH)
+        return Model
 
     def collect_handler(
         self, handler_name: str, source_path: str
