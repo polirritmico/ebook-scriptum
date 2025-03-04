@@ -22,12 +22,15 @@ class Scriptorium:
 
     def setup(self, opts: dict | str | Path = None) -> None:
         self.options.setup(opts)
-        self.set_options()
+        self.set_handlers()
+        self.set_handlers_options()
+
+    def set_handlers(self) -> None:
         self.set_importer()
         self.set_transmuter()
         self.set_exporter()
 
-    def set_options(self) -> None:
+    def set_handlers_options(self) -> None:
         self.input_files = self.options.input_file
         self.output = self.options.output
 
@@ -35,13 +38,13 @@ class Scriptorium:
         if importer_opts:
             self.importer.set_options(importer_opts)
 
+        exporter_opts = self.options.get_export_opts()
+        if exporter_opts and self.exporter:
+            self.exporter.set_options(exporter_opts)
+
         transmuter_opts = self.options.get_transmuter_opts()
         if transmuter_opts:
             self.transmuter.set_options(transmuter_opts)
-
-        exporter_opts = self.options.get_exporter_opts()
-        if exporter_opts and self.transmuter.exporter:
-            self.transmuter.exporter.set_options(exporter_opts)
 
     def set_importer(self, importer: ImporterHandler | None = None) -> None:
         self.importer = importer or self.options.importer
