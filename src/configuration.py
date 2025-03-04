@@ -53,7 +53,7 @@ class ScriptoriumConfiguration:
     def parse_options(self, opts: dict | None = None) -> None:
         opts = opts or self.raw_opts.copy()
         if not opts:
-            raise ValueError("Missing opts. Try set_options() first.")
+            raise ValueError("Missing opts. Try resolve_and_validate_options() first.")
 
         self.parse_non_handlers(opts)
         self.parse_handlers(opts)
@@ -73,6 +73,7 @@ class ScriptoriumConfiguration:
             model = Model() if Model is not None else None
             self.transmuter = Transmuter()
             self.transmuter.set_model(model)
+            self.transmuter.set_exporter(self.exporter)
 
     def parse_non_handlers(self, opts: dict) -> None:
         opts_input = opts.get("input")
@@ -118,8 +119,10 @@ class ScriptoriumConfiguration:
             raise ValueError("Missing importer")
         return Importer
 
-    def get_exporter(self, opts: dict) -> ExporterHandler:
+    def get_exporter(self, opts: dict) -> ExporterHandler | None:
         exporter_name = opts.get("exporter")
+        if exporter_name is None:
+            return
         Exporter = self.collector.collect_exporter_handler(exporter_name)
         if not Exporter:
             raise ValueError("Missing exporter")
@@ -206,7 +209,7 @@ class ScriptoriumConfiguration:
             if not file.exists():
                 raise ValueError(f"File does not exists: '{file}'")
 
-    def get_exporter_opts(self) -> dict | None:
+    def get_export_opts(self) -> dict | None:
         return self.exporter_opts
 
     def get_importer_opts(self) -> dict | None:

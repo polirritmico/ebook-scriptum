@@ -13,6 +13,7 @@ class Scriptorium:
 
     def __init__(self):
         self.importer: ImporterHandler | None = None
+        self.exporter: ExporterHandler | None = None
         self.transmuter: TransmuterHandler | None = None
         self.options: ScriptoriumConfiguration = ScriptoriumConfiguration()
         self.document: Document | None = None
