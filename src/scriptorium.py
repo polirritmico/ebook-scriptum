@@ -53,11 +53,7 @@ class Scriptorium:
         self.transmuter = transmuter or self.options.transmuter
 
     def set_exporter(self, exporter: ExporterHandler | None = None) -> None:
-        exporter = exporter or self.options.exporter
-        if exporter is None:
-            return
-        exporter.set_options(self.options)
-        self.transmuter.set_exporter(exporter)
+        self.exporter = exporter or self.options.exporter
 
     def load_data(self) -> Document:
         self.importer.load_data(self.input_files)
