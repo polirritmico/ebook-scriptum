@@ -28,7 +28,7 @@ def test_transmuter_and_importer_not_overwriten_by_config() -> None:
     config.importer = case_importer
     config.transmuter = case_transmuter
 
-    config.set_options(case)
+    config.resolve_and_validate_opts(case)
     config.parse_options(case)
     out_transmuter = config.transmuter
 
@@ -46,7 +46,7 @@ def test_load_config_json() -> None:
     ExpectedModel = ModelHandler
 
     config = ScriptoriumConfiguration()
-    case = config.set_options(case)
+    case = config.resolve_and_validate_opts(case)
     config.parse_options(case)
 
     for expected, output in zip(expected_input, config.input_file):
