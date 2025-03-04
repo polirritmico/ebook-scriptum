@@ -18,6 +18,34 @@ def tmp_dir():
 
 
 # @pytest.mark.skip(reason="Slow execution")
+def test_tts_ebook_to_wav(tmp_dir) -> None:
+    case = {
+        "input": "tests/files/simple_ebook.epub",
+        "output": "tests/files/outputs/tts_simple_ebook.wav",
+        "transmuter": ("CoquiTTS", "ModelVittsEs"),
+        "importer": "EpubImporter",
+        "transmuter_opts": {
+            "vitts_es": {
+                "lang": "es",
+                "log": None,
+            },
+        },
+    }
+
+    scriptum = Scriptorium()
+    scriptum.setup(case)
+    scriptum.load_data()
+    scriptum.transmute()
+    output = scriptum.export()
+
+    assert output
+    assert isinstance(output, Path)
+    assert output.exists()
+    assert output.is_file()
+    assert output.stat().st_size > 0
+
+
+# @pytest.mark.skip(reason="Slow execution")
 def test_translate_full_ebook(tmp_dir) -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
