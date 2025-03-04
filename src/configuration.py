@@ -175,17 +175,16 @@ class ScriptoriumConfiguration:
         return detected_type_mismatches
 
     def check_input_opts_missing_entries(self, opts: dict) -> list[str]:
-        # TEST: This should not return an error with "" values (e.g. default model)
         detected_missing_keys = []
-        for key, spec in self.config_spec.items():
-            if not spec["mandatory"]:
+        for expected_key, value_spec in self.config_spec.items():
+            if value_spec["mandatory"] is False:
                 continue
 
-            if key not in opts:
-                err = f"  - Missing '{key}'"
+            if expected_key not in opts:
+                err = f"  - Missing '{expected_key}'"
                 detected_missing_keys.append(err)
-            elif opts[key] is None:
-                err = f"  - Mandatory value is None: '{key}'"
+            elif opts[expected_key] is None:
+                err = f"  - Mandatory value is None: '{expected_key}'"
                 detected_missing_keys.append(err)
 
         if detected_missing_keys:
@@ -198,7 +197,7 @@ class ScriptoriumConfiguration:
         if not dir.exists():
             if not mkdir:
                 raise ValueError(f"Output path does not exists: {dir}")
-            # 755 owner|group|others, 7: read+write+execute; 5: read+execute
+            # 755 (owner|group|others, 7: read+write+execute; 5: read+execute)
             dir.mkdir(mode=0o755, parents=True)
 
     def check_files(self, files: list[Path]) -> None:
