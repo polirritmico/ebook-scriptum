@@ -22,11 +22,9 @@ def test_tts_ebook_to_wav(tmp_dir) -> None:
         "output": "tests/files/outputs/tts_simple_ebook.wav",
         "transmuter": ("CoquiTTS", "ModelVittsEs"),
         "importer": "EpubImporter",
-        "transmuter_opts": {
-            "vitts_es": {
-                "lang": "es",
-                "log": None,
-            },
+        "exporter_opts": {
+            "lang": "es",
+            "log": None,
         },
     }
 
