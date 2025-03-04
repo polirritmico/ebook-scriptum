@@ -30,15 +30,26 @@ class CoquiTTS:
         self.tts = None
         self.device = "cuda"
         self.exporter = None
+        self.model = None
         self.opts = {}
+        self.tts_opts = {}
 
     def generic_response_validator(self, response: str | None, original: str) -> bool:
         return True
 
-    def set_options(self, options: dict) -> None:
-        if not isinstance(options, dict):
+    def set_options(self, opts: dict) -> None:
+        if not isinstance(opts, dict):
             raise TypeError("CoquiTTS bad options type")
-        self.opts = options
+        self.opts = opts
+        self.set_export_options(opts)
+
+    def set_export_options(self, opts: dict) -> None:
+        opts = opts.get("export_opts")
+        if not opts:
+            return
+
+        self.tts_opts = opts
+        self.tts_opts["vocoder_name"] = self.model.vocoder
 
     def set_model(self, model: ModelHandler) -> None:
         if model and model.transmuter_type != self.transmuter_type:
@@ -54,9 +65,7 @@ class CoquiTTS:
             self.run_validator = self.generic_response_validator
 
     def set_exporter(self, exporter: ExporterHandler) -> None:
-        if not isinstance(exporter, ExporterHandler):
-            raise TypeError("exporter is not an ExporterHandler")
-        self.exporter = exporter
+        return
 
     def transmute(self, document: Document) -> None:
         processed_document = self.process_text(document)
@@ -71,11 +80,6 @@ class CoquiTTS:
         if not hasattr(self, "document") or not hasattr(self, "tts"):
             raise ValueError("Not transmuted document. Try transmute() first")
 
-        tts_opts = {"vocoder_name": self.model.vocoder}
-
-        # if hasattr(self, "lang_model") and self.lang_model:
-        #     tts_opts["lang"] = self.lang_model
-
         if len(self.document) > 1:
             # FIX: Implement this and clean options! check if is an output dir
             raise NotImplementedError("No multiple output files implemented")
@@ -87,9 +91,7 @@ class CoquiTTS:
         #    ~/.local/lib/python3.10/site-packages/TTS/utils/synthesizer.py:93
 
         for name, section in self.document.items():
-            tts_opts["text"] = section
-            tts_opts["file_path"] = output_path  # / name
-            self.tts.tts_to_file(**tts_opts)
+            self.tts.tts_to_file(**self.tts_opts, text=section, file_path=output_path)
 
         return output_path
 
