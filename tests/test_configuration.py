@@ -86,6 +86,17 @@ def test_minimal_keys_check_missing_input() -> None:
         assert expected_str in output_error.lower()
 
 
+def test_config_without_exporter() -> None:
+    case = {
+        "input": "tests/files/simple_ebook.epub",
+        "output": "tests/files/output",
+        "transmuter": "OllamaTranslator",
+        "importer": "EpubImporter",
+    }
+    config = ScriptoriumConfiguration()
+    config.check_spec_compliance(case)
+
+
 def test_detect_opts_mismatch_types_with_spec() -> None:
     case = {
         "input": "tests/files/simple_ebook.epub",
