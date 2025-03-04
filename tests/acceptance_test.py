@@ -6,8 +6,6 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from src.document import Document
-from src.importers.epub import EpubImporter
 from src.scriptorium import Scriptorium
 
 
