@@ -39,12 +39,13 @@ class ScriptoriumConfiguration:
         self.collector = Collector()
 
     def setup(self, opts: dict | str | Path) -> "ScriptoriumConfiguration":
-        opts = self.set_options(opts)
+        opts = self.resolve_and_validate_options(opts)
         self.parse_options(opts)
         return self
 
-    def set_options(self, opts: dict | str | Path) -> dict:
-        opts = self.collector.collect_options(opts)
+    def resolve_and_validate_options(self, opts: dict | str | Path) -> dict:
+        if not isinstance(opts, dict):
+            opts = self.collector.collect_options(opts)
         self.raw_opts = opts.copy()
         self.check_spec_compliance(opts)
         return opts

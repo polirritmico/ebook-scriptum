@@ -65,9 +65,6 @@ class Collector:
         raise ImportError(f"Could not import handler {handler_name} from {module_name}")
 
     def collect_options(self, opts: dict | str) -> dict[str, str | dict[str, str]]:
-        if isinstance(opts, dict):
-            return opts
-
         opts_path = opts if isinstance(opts, Path) else Path(opts)
 
         if opts_path.is_dir():
