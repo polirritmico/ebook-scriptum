@@ -141,6 +141,7 @@ class ScriptoriumConfiguration:
         return (Transmuter, Model)
 
     def check_spec_compliance(self, opts: dict) -> None:
+        self.fill_optional_spec_fields_with_none()
         missing_entries_err = self.check_input_opts_missing_entries(opts)
         mismatch_settings_err = self.check_input_opts_mismatch_types(opts)
 
@@ -149,6 +150,11 @@ class ScriptoriumConfiguration:
             msg = "Errors detected. Check passed options.\n"
             errors_msg = [msg] + missing_entries_err + mismatch_settings_err
             raise ValueError("\n".join(errors_msg))
+
+    def fill_optional_spec_fields_with_none(self) -> None:
+        for field, spec in self.config_spec.items():
+            if spec["mandatory"] is False:
+                spec["types"] = (*spec.get("types"), type(None))
 
     def check_input_opts_mismatch_types(self, opts: dict) -> list[str]:
         detected_type_mismatches = []
