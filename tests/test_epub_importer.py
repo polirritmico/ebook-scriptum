@@ -21,6 +21,16 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
+def test_epub_importer_handler_protocol_compliance() -> None:
+    case_file = [Path("tests/files/simple_ebook.epub")]
+
+    epub = EpubImporter()
+    epub.load_data(case_file)
+    output = epub.generate_document()
+    assert type(output).__name__ == "Document"
+    assert output.metadata
+
+
 def test_get_sections_in_order_from_content_opf(clean_fs) -> None:
     case_file = Path("tests/files/simple_ebook.epub")
     expected_files = [

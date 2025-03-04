@@ -17,16 +17,6 @@ def tmp_dir():
         yield tmp
 
 
-def test_epub_importer_handler_protocol_compliance() -> None:
-    case_file = [Path("tests/files/simple_ebook.epub")]
-
-    epub = EpubImporter()
-    epub.load_data(case_file)
-    output = epub.generate_document()
-    assert isinstance(output, Document)
-    assert output.metadata
-
-
 # @pytest.mark.skip(reason="Slow execution")
 def test_translate_full_ebook(tmp_dir) -> None:
     case = {
