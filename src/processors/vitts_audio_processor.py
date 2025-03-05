@@ -6,7 +6,7 @@ from pathlib import Path
 import ffmpeg
 
 
-class AudioProcessor:
+class VittsAudioProcessor:
     DEFAULT_EXPORT_SETTINGS = {
         "codec": "libmp3lame",
         "ab": "64k",
