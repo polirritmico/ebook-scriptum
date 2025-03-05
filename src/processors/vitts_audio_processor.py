@@ -23,6 +23,18 @@ class AudioProcessor:
     def __init__(self):
         self.tmp_register: list[str] = []
 
+    def run(
+        self, input_file: str | Path, output_file: str | Path, opts: dict | None = None
+    ) -> None:
+        opts_remove_inner = opts and opts.get("remove_inner")
+        opts_add_wrap = opts and opts.get("add_wrap")
+        opts_codec = opts and opts.get("codec")
+
+        self.remove_inner_silences(opts_remove_inner)
+        self.add_wrap_silences(opts_add_wrap)
+        self.wav_to_mp3(opts_codec)
+
+        self.clean_temp_files()
 
     def remove_inner_silences(
         self, wav_file: str | Path, filter: dict | None = None
@@ -70,3 +82,8 @@ class AudioProcessor:
         tmp_filename = f"{input_file[:-4]}_temp{tmp_idx}.wav"
         self.tmp_register.append(tmp_filename)
         return tmp_filename
+
+    def clean_temp_files(self) -> None:
+        for tmp_file in self.tmp_register:
+            if "temp" in tmp_file:
+                Path(tmp_file).unlink()
