@@ -24,15 +24,21 @@ class VittsAudioProcessor:
         self.tmp_register: list[str] = []
 
     def run(
-        self, input_file: str | Path, output_file: str | Path, opts: dict | None = None
+        self,
+        input_file: str | Path,
+        output_file: str | Path | None = None,
+        opts: dict | None = None,
     ) -> None:
         opts_remove_inner = opts and opts.get("remove_inner")
         opts_add_wrap = opts and opts.get("add_wrap")
         opts_codec = opts and opts.get("codec")
 
-        self.remove_inner_silences(opts_remove_inner)
-        self.add_wrap_silences(opts_add_wrap)
-        self.wav_to_mp3(opts_codec)
+        if output_file is None:
+            output_file = str(input_file)
+
+        file = self.remove_inner_silences(input_file, opts_remove_inner)
+        file = self.add_wrap_silences(file, opts_add_wrap)
+        self.wav_to_mp3(file, input_file, opts_codec)
 
         self.clean_temp_files()
 
