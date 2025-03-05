@@ -17,9 +17,11 @@ def tmp_dir():
 
 # @pytest.mark.skip(reason="Slow execution")
 def test_tts_ebook_to_wav(tmp_dir) -> None:
+    expected_file = Path("tests/files/outputs/tts_test/Section0001.wav")
     case = {
         "input": "tests/files/simple_ebook.epub",
-        "output": "tests/files/outputs/tts_simple_ebook.wav",
+        # "selection": ["Section0001.xhtml"],
+        "output": "tests/files/outputs/tts_test/",
         "transmuter": ("CoquiTTS", "ModelVittsEs"),
         "importer": "EpubImporter",
         "exporter_opts": {
@@ -32,13 +34,11 @@ def test_tts_ebook_to_wav(tmp_dir) -> None:
     scriptum.setup(case)
     scriptum.load_data()
     scriptum.transmute()
-    output = scriptum.export()
+    scriptum.export()
 
-    assert output
-    assert isinstance(output, Path)
-    assert output.exists()
-    assert output.is_file()
-    assert output.stat().st_size > 0
+    assert expected_file.exists()
+    assert expected_file.is_file()
+    assert expected_file.stat().st_size > 0
 
 
 # @pytest.mark.skip(reason="Slow execution")
