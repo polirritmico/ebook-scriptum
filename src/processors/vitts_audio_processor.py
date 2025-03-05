@@ -11,6 +11,8 @@ class AudioProcessor:
         "stop_periods": -1,
         "stop_threshold": "-40dB",
         "stop_duration": 0.8,
+    }
+    DEFAULT_WRAP_FILTER = {"pad_dur": 1}
 
     def __init__(self):
         self.tmp_register: list[str] = []
@@ -25,6 +27,23 @@ class AudioProcessor:
         filter = filter or self.DEFAULT_INNER_SILENCE_FILTER
 
         stream = ffmpeg.input(wav_file).filter("silenceremove", **filter)
+        stream.output(tmp_file).run(overwrite_output=True)
+        return tmp_file
+
+    def add_wrap_silences(
+        self, wav_file: str | Path, filter: dict | None = None
+    ) -> str:
+        wrap_duration = "1s"
+
+        if isinstance(wav_file, Path):
+            wav_file = str(wav_file)
+        tmp_file = self.make_temp_filename(wav_file)
+
+        stream = (
+            ffmpeg.input(wav_file)
+            .filter("adelay", delays=wrap_duration)
+            .filter("apad", pad_dur=wrap_duration)
+        )
         stream.output(tmp_file).run(overwrite_output=True)
         return tmp_file
 
