@@ -6,6 +6,7 @@ from pathlib import Path
 from src.configuration import ScriptoriumConfiguration
 from src.document import Document
 from src.protocols import ExporterHandler, ImporterHandler, TransmuterHandler
+from src.selectors import DocumentSectionSelector
 
 
 class Scriptorium:
