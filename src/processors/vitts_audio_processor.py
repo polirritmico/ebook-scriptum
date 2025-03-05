@@ -7,6 +7,12 @@ import ffmpeg
 
 
 class AudioProcessor:
+    DEFAULT_EXPORT_SETTINGS = {
+        "codec": "libmp3lame",
+        "ab": "64k",
+        "ar": "22050",
+        "ac": 1,
+    }
     DEFAULT_INNER_SILENCE_FILTER = {
         "stop_periods": -1,
         "stop_threshold": "-40dB",
@@ -46,6 +52,18 @@ class AudioProcessor:
         )
         stream.output(tmp_file).run(overwrite_output=True)
         return tmp_file
+
+    def wav_to_mp3(
+        self, wav_file: str, output_file: str, settings: dict | None = None
+    ) -> None:
+        if isinstance(wav_file, Path):
+            wav_file = str(wav_file)
+        if isinstance(output_file, Path):
+            output_file = str(output_file)
+
+        export_settings = settings or self.DEFAULT_EXPORT_SETTINGS
+        audio = ffmpeg.input(wav_file)
+        audio.output(output_file, **export_settings).run(overwrite_output=True)
 
     def make_temp_filename(self, input_file: str) -> str:
         tmp_idx = len(self.tmp_register) + 1
