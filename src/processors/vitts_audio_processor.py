@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 from pathlib import Path
 
 import ffmpeg
@@ -21,7 +22,7 @@ class VittsAudioProcessor:
     DEFAULT_WRAP_FILTER = {"pad_dur": 1}
 
     def __init__(self):
-        self.tmp_register: list[str] = []
+        self.tmp_register: list[Path] = []
 
     def run(
         self,
@@ -86,9 +87,10 @@ class VittsAudioProcessor:
         audio = ffmpeg.input(wav_file)
         audio.output(output_file, **export_settings).run(overwrite_output=True)
 
-    def make_temp_filename(self, input_file: str) -> str:
+    def make_temp_filename(self, original_filename: str) -> str:
+        original_filename = re.sub(r"_temp\d+", "", original_filename)
         tmp_idx = len(self.tmp_register) + 1
-        tmp_filename = f"{input_file[:-4]}_temp{tmp_idx}.wav"
+        tmp_filename = f"{original_filename[:-4]}_temp{tmp_idx}.wav"
         self.tmp_register.append(Path(tmp_filename))
         return tmp_filename
 
