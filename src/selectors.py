@@ -9,7 +9,7 @@ from src.document import Document
 
 
 class DocumentSectionSelector:
-    def select(self, document: Document, opts: ScriptoriumConfiguration) -> dict:
+    def select(self, document: Document, opts: ScriptoriumConfiguration) -> Document:
         preselection = opts.get_selected_sections()
         if preselection:
             return self.resolve_selection(document, preselection)
@@ -20,26 +20,22 @@ class DocumentSectionSelector:
         try:
             import inquirer
         except Exception:
-            # TODO: self.failback_manual_selector(document)?
             raise ImportError("Failed import: inquirer")
 
-        # doc_spine = document.metadata.spine
-        choices: list[str] = []
-        for i, section in enumerate(document.sections, start=1):
-            name = f"{i:02}. {section.title}"
-            choices.append(name)
+        section_choices: dict[str, str] = {}
+        for section in document.sections.values():
+            choice = f"{section.order:02}. {section.title}"  # {section.filepath.name}"
+            section_choices[choice] = section.filepath
 
         sections_selector_checkbox = inquirer.Checkbox(
             "sections",
             message="Select document sections to transmute",
-            choices=choices,
+            choices=list(section_choices.keys()),
         )
-        selected = inquirer.prompt([sections_selector_checkbox]).get("sections")
-        selected_sections = []
-        for choice in selected:
-            idx = int(choice.split(".")[0]) - 1
-            selected_sections.append(document.sections[idx])
-        return selected_sections
+        user_selection = inquirer.prompt([sections_selector_checkbox]).get("sections")
+
+        selected_sections = [section_choices[selected] for selected in user_selection]
+        return self.resolve_selection(document, selected_sections)
 
     def resolve_selection(self, document: Document, selected: list[Path]) -> Document:
         selected_sections = {file.name: document.get_section(file) for file in selected}
