@@ -38,6 +38,9 @@ class DocumentSectionSelector:
         return self.resolve_selection(document, selected_sections)
 
     def resolve_selection(self, document: Document, selected: list[Path]) -> Document:
+        if selected[0].name == "*":
+            return document
+
         selected_sections = {file.name: document.get_section(file) for file in selected}
         filtered_document = copy(document)
         filtered_document.sections = selected_sections
