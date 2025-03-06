@@ -120,7 +120,7 @@ class CoquiTTS:
     def apply_audio_post_processing(self, input_file: Path, output_file: Path) -> None:
         if self.processor is None:
             self.processor = VittsAudioProcessor()
-        self.processor.run(input_file, output_file)
+        self.processor.run(input_file, output_file, self.opts)
 
     def process_text(self, document: Document) -> dict[Path, str]:
         processed_document: dict[Path, str] = {}
