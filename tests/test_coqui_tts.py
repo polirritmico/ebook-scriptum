@@ -23,7 +23,7 @@ def test_tts_acceptance(tmp_dir) -> None:
     case_file = Path("tests/files/simple.txt")
     expected1 = tmp_dir / "simple.wav"
     expected2 = tmp_dir / "simple.mp3"
-    case_opts = {"lang": "es", "log": True, "keep_wav": True}
+    case_opts = {"text_processor_opts": {"lang": "es", "log": True, "keep_wav": True}}
 
     text = SimpleTextImporter()
     text.load_data(case_file)
