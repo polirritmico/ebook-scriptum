@@ -33,6 +33,7 @@ class VittsAudioProcessor:
         opts_remove_inner = opts and opts.get("remove_inner")
         opts_add_wrap = opts and opts.get("add_wrap")
         opts_codec = opts and opts.get("codec")
+        keep_wav = opts and opts.get("keep_wav")
 
         if output_file is None:
             output_file = Path(input_file).with_suffix(".mp3")
@@ -41,7 +42,7 @@ class VittsAudioProcessor:
         audio_file = self.add_wrap_silences(audio_file, opts_add_wrap)
         self.wav_to_mp3(audio_file, output_file, opts_codec)
 
-        self.clean_temp_files()
+        self.clean_temp_files(not keep_wav and input_file)
 
     def remove_inner_silences(
         self, wav_file: str | Path, filter: dict | None = None
@@ -94,7 +95,12 @@ class VittsAudioProcessor:
         self.tmp_register.append(Path(tmp_filename))
         return tmp_filename
 
-    def clean_temp_files(self) -> None:
-        for tmp_file in self.tmp_register:
-            if "temp" in tmp_file.name:
-                tmp_file.unlink()
+    def clean_temp_files(self, input_wav: str | Path | None = None) -> None:
+        if isinstance(input_wav, str):
+            input_wav = Path(input_wav)
+        if input_wav:
+            input_wav.unlink()
+
+        while self.tmp_register:
+            tmp_file = self.tmp_register.pop()
+            tmp_file.unlink()
