@@ -53,12 +53,16 @@ class CoquiTTS:
         self.set_export_options(opts)
 
     def set_export_options(self, opts: dict) -> None:
-        opts = opts.get("export_opts")
-        if not opts:
-            return
+        word_dict = opts.get("word_dict")
+        if word_dict:
+            self.word_dict = word_dict
 
-        self.tts_opts = opts
-        self.tts_opts["vocoder_name"] = self.model.vocoder
+        tts_opts = opts.get("exporter_opts")
+        if not tts_opts:
+            return
+        self.tts_opts = tts_opts
+        # FIX: model vocoder_name is set in prepare_requires not at this stage
+        # self.tts_opts["vocoder_name"] = self.model.vocoder
 
     def set_model(self, model: ModelHandler) -> None:
         if model and model.transmuter_type != self.transmuter_type:
@@ -87,14 +91,8 @@ class CoquiTTS:
         ).to(self.device)
 
     def export(self, output_dir: Path) -> None:
-        # TODO: Add a document selector
         if not hasattr(self, "processed_document") or not hasattr(self, "tts"):
             raise ValueError("Not transmuted document. Try transmute() first")
-
-        # # TODO: REMOVE
-        # if len(self.document) > 1:
-        #     # FIX: Implement this and clean options! check if is an output dir
-        #     raise NotImplementedError("No multiple output files implemented")
 
         # NOTE:
         # 1. Change config 20100 -> 19800 khz to improve the tempo (to fast):
@@ -107,33 +105,31 @@ class CoquiTTS:
             raise ValueError(f"Output path is not a dir: '{output_dir}'")
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        processed_files = []
         for name, section in self.processed_document.items():
             if not section:
                 continue
             name = Path(name).with_suffix(".wav")
-            output_file = output_dir / name
-            processed_files.append(output_file)
-            self.tts.tts_to_file(**self.tts_opts, text=section, file_path=output_file)
+            audio_file = output_dir / name
+            self.tts.tts_to_file(**self.tts_opts, text=section, file_path=audio_file)
 
-        self.apply_audio_post_processing(processed_files)
+            output_file = audio_file.with_suffix(".mp3")
+            self.apply_audio_post_processing(audio_file, output_file)
 
         return output_dir
 
-    def apply_audio_post_processing(self, files: list[Path]) -> None:
-        processor = VittsAudioProcessor()
-        for file in files:
-            processor.run(file)
+    def apply_audio_post_processing(self, input_file: Path, output_file: Path) -> None:
+        if self.processor is None:
+            self.processor = VittsAudioProcessor()
+        self.processor.run(input_file, output_file)
 
     def process_text(self, document: Document) -> dict[Path, str]:
         processed_document: dict[Path, str] = {}
         opts = self.opts.get("text_processor_opts") or self.model.text_processor_opts
-        book_words = self.opts.get("book_words", {})
 
         text_processor = VittsTextProcessor().process_text
         for section_name, section in document.sections.items():
             section_txt = document.get_content(section_name, True)
-            processed_text = text_processor(section_txt, book_words, opts)
-            processed_document[section_name] = processed_text
+            processed_text = text_processor(section_txt, self.word_dict, opts)
+            processed_document[section.title] = processed_text
 
         return processed_document
