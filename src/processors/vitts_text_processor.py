@@ -100,12 +100,16 @@ class VittsTextProcessor:
         Apply all text filters and processors to improve the str send to the TTS
 
         :param raw_text: Unformated text.
+        :type raw_text: str
         :param replacement_dict: Dict with strings to repalce `dict[old] = new`
+        :type replacement_dict: Optional[dict[str, str]]
         :param opts: Special options to control inner behaviour:
             - `lang`: en, es
             - `log` (`bool`): store the generated multiline string into `log/`
+        :type opts: Optional[dict]
 
         :return: Multiline processed string
+
         """
         processed: list[str] = []
         lang = opts.get("lang") or self.DEFAULT_LANG
