@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
 
 from src.scriptorium import Scriptorium
+
+# HACK: to avoid anoying warning messages: https://github.com/ROCm/MIOpen/issues/2981
+os.environ["MIOPEN_LOG_LEVEL"] = "3"
 
 
 @pytest.fixture
