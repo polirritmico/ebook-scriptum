@@ -10,7 +10,7 @@ from src.processors.vitts_audio_processor import VittsAudioProcessor
 
 @pytest.mark.skip(reason="Manual test")
 def test_remove_inner_silences() -> None:
-    source_case_file = "tests/files/audio/simple_audio.wav"
+    source_case_file = "tests/files/audio/simple.wav"
     case = "tests/files/audio/inner_silences_output.wav"
     shutil.copy(source_case_file, case)
 
@@ -20,7 +20,7 @@ def test_remove_inner_silences() -> None:
 
 @pytest.mark.skip(reason="Manual test")
 def test_add_wrap_silences() -> None:
-    source_case_file = "tests/files/audio/simple_audio.wav"
+    source_case_file = "tests/files/audio/simple.wav"
     case = "tests/files/audio/add_wrap_output.wav"
     shutil.copy(source_case_file, case)
 
@@ -30,7 +30,7 @@ def test_add_wrap_silences() -> None:
 
 @pytest.mark.skip(reason="Manual test")
 def test_wav_to_mp3() -> None:
-    input_file = "tests/files/audio/simple_audio.wav"
+    input_file = "tests/files/audio/simple.wav"
     output_file = "tests/files/audio/output.mp3"
 
     processor = VittsAudioProcessor()
@@ -39,7 +39,7 @@ def test_wav_to_mp3() -> None:
 
 @pytest.mark.skip(reason="Manual test")
 def test_full_process() -> None:
-    input_file = "tests/files/audio/simple_audio.wav"
+    input_file = "tests/files/audio/simple.wav"
     output_file = "tests/files/audio/output.mp3"
 
     processor = VittsAudioProcessor()
