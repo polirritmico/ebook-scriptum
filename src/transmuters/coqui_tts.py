@@ -16,24 +16,32 @@ class CoquiTTS:
     exporter: ExporterHandler | None
 
     def __init__(self):
+        self.device = "cuda"
+        self.exporter = None
+        self.model = None
+        self.opts = {}
+        self.processor = None
+        self.tts = None
+        self.tts_opts = {}
+        self.word_dict: dict[str, str] = {}
+
+    def import_libraries(self) -> None:
+        """
+        Loading torch and TTS tooks a lot of time so we move the import here,
+        to use it when it's really is needed.
+        """
         try:
             global torch
-            import torch
+            # import torch
+            from torch import cuda
 
-            assert torch.cuda.is_available()
+            assert cuda.is_available()
 
             global TTS
             from TTS.api import TTS
 
         except Exception:
             raise ImportError
-
-        self.tts = None
-        self.device = "cuda"
-        self.exporter = None
-        self.model = None
-        self.opts = {}
-        self.tts_opts = {}
 
     def generic_response_validator(self, response: str | None, original: str) -> bool:
         return True
@@ -73,6 +81,7 @@ class CoquiTTS:
         self.processed_document = processed_document
 
         self.model.prepare_request(self.opts)
+        self.import_libraries()
         self.tts = TTS(
             model_name=self.model.name, config_path=self.opts.get("config_path")
         ).to(self.device)
