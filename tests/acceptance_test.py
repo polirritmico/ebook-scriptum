@@ -19,6 +19,8 @@ def tmp_dir():
         yield Path(tmp)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_audio_processor(tmp_dir):
     case = ["TOC.xhtml", "Section0001.xhtml"]
     expected1 = tmp_dir / "Chapter 1.mp3"
