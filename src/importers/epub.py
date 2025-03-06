@@ -142,13 +142,22 @@ class EpubImporter:
             raise ValueError("Missing soup")
 
         ordered_section_files = []
-        spin = [itemref["idref"] for itemref in soup.find_all("itemref")]
+        spine = [itemref["idref"] for itemref in soup.find_all("itemref")]
+        manifest = {item["id"]: item["href"] for item in soup.find_all("item")}
 
-        # Need the existing Path files, not the path string
-        for section in spin:
+        # Cross-reference: The spine has the order, the manifest the actual file
+        for section_name in spine:
+            full_section_name = manifest.get(section_name, "")
+            section_file = full_section_name.rsplit("/", 1)[-1]
+            if not section_file:
+                continue
+
+            # TODO: Refactor. An "inner for" each time?
             for readed_file in self.text_files:
-                if readed_file.name == section:
+                if readed_file.name == section_file:
                     ordered_section_files.append(readed_file)
+                    break
+
         return ordered_section_files
 
     def get_text_from_soup_tag(self, tag: str, soup: BeautifulSoup) -> str | None:
