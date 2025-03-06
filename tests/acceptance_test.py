@@ -17,17 +17,24 @@ def tmp_dir():
 
 # @pytest.mark.skip(reason="Slow execution")
 def test_tts_ebook_to_wav(tmp_dir) -> None:
-    expected_file = Path("tests/files/outputs/tts_test/Section0001.wav")
+    expected_file = Path("tests/files/outputs/tts_test/Chapter 1.wav")
+    expected_file.unlink(missing_ok=True)
+    word_dict = {
+        "Chapter": "Capítulo",
+        "This is a basic paragraph.": "Esto es un párrafo sencillo.",
+    }
     case = {
         "input": "tests/files/simple_ebook.epub",
-        # "selection": ["Section0001.xhtml"],
         "output": "tests/files/outputs/tts_test/",
         "transmuter": ("CoquiTTS", "ModelVittsEs"),
         "importer": "EpubImporter",
         "exporter_opts": {
             "lang": "es",
-            "log": None,
+            "log": "tests/files/outputs/tts_test/log",
+            "keep_wav": True,
+            "word_dict": word_dict,
         },
+        "selection": ["Section0001.xhtml"],
     }
 
     scriptum = Scriptorium()
