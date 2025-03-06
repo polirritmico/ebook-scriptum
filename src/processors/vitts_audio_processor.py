@@ -34,11 +34,11 @@ class VittsAudioProcessor:
         opts_codec = opts and opts.get("codec")
 
         if output_file is None:
-            output_file = str(input_file)
+            output_file = Path(input_file).with_suffix(".mp3")
 
-        file = self.remove_inner_silences(input_file, opts_remove_inner)
-        file = self.add_wrap_silences(file, opts_add_wrap)
-        self.wav_to_mp3(file, input_file, opts_codec)
+        audio_file = self.remove_inner_silences(input_file, opts_remove_inner)
+        audio_file = self.add_wrap_silences(audio_file, opts_add_wrap)
+        self.wav_to_mp3(audio_file, output_file, opts_codec)
 
         self.clean_temp_files()
 
@@ -72,7 +72,10 @@ class VittsAudioProcessor:
         return tmp_file
 
     def wav_to_mp3(
-        self, wav_file: str, output_file: str, settings: dict | None = None
+        self,
+        wav_file: str | Path,
+        output_file: str | Path,
+        settings: dict | None = None,
     ) -> None:
         if isinstance(wav_file, Path):
             wav_file = str(wav_file)
@@ -86,10 +89,10 @@ class VittsAudioProcessor:
     def make_temp_filename(self, input_file: str) -> str:
         tmp_idx = len(self.tmp_register) + 1
         tmp_filename = f"{input_file[:-4]}_temp{tmp_idx}.wav"
-        self.tmp_register.append(tmp_filename)
+        self.tmp_register.append(Path(tmp_filename))
         return tmp_filename
 
     def clean_temp_files(self) -> None:
         for tmp_file in self.tmp_register:
-            if "temp" in tmp_file:
-                Path(tmp_file).unlink()
+            if "temp" in tmp_file.name:
+                tmp_file.unlink()
