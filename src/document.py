@@ -12,8 +12,15 @@ class Document:
         self.sections: dict[str, Section] | None = None
         self.source: Path | None = None
 
-    def get_content(self, section_name: str, raw: bool = False) -> str:
-        section = self.sections.get(section_name, None)
+    def get_section(self, section_name: str | Path) -> Section:
+        if isinstance(section_name, Path):
+            section_name = section_name.name
+        return self.sections.get(section_name)
+
+    def get_content(self, section_name: str | Path, raw: bool = False) -> str:
+        if isinstance(section_name, Path):
+            section_name = section_name.name
+        section = self.sections.get(section_name)
         if not section:
             raise KeyError(f"Missing section from the document: {section_name}")
 
