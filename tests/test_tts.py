@@ -12,17 +12,21 @@ from src.transmuters.coqui_tts import CoquiTTS
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.filterwarnings("ignore::UserWarning")
-def test_foo() -> None:
+def test_tts_acceptance() -> None:
     case_file = Path("tests/files/simple.txt")
-    output_file = Path("tests/files/outputs/tts_out.wav")
+    output_dir = Path("tests/files/outputs/audios")
+    outfile = output_dir / "simple.wav"
+    outfile.unlink(missing_ok=True)  # clean old execution output
+    outfile.with_suffix(".mp3").unlink(missing_ok=True)
+
     case_opts = {
         "vitts": {
             "lang": "es",
-            "log": None,
+            "log": True,
         },
-        "output_file": output_file,
+        # TODO: is this used? change to output_dir?
+        "output_file": output_dir,
     }
-    output_file.unlink(missing_ok=True)  # clean old execution output
 
     text = SimpleTextImporter()
     text.load_data(case_file)
@@ -33,8 +37,12 @@ def test_foo() -> None:
     tts.set_model(model)
     tts.set_options(case_opts)
     tts.transmute(doc)
-    tts.export(output_file)
+    tts.export(output_dir)
 
-    assert output_file.exists()
-    assert output_file.is_file()
-    assert output_file.stat().st_size > 0, "Output should not be an empty file"
+    assert outfile.exists()
+    assert outfile.is_file()
+    assert outfile.stat().st_size > 0, "mp3 file should not be an empty file"
+    outfile.with_suffix(".mp3")
+    assert outfile.exists()
+    assert outfile.is_file()
+    assert outfile.stat().st_size > 0, "wav file should not be an empty file"
