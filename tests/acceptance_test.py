@@ -19,6 +19,32 @@ def tmp_dir():
         yield Path(tmp)
 
 
+def test_audio_processor(tmp_dir):
+    case = ["TOC.xhtml", "Section0001.xhtml"]
+    expected1 = tmp_dir / "Chapter 1.mp3"
+    expected2 = tmp_dir / "Índice de contenido.mp3"
+
+    opts = {
+        "input": "tests/files/simple_ebook.epub",
+        "output": tmp_dir,
+        "selection": case,
+        "transmuter": ("CoquiTTS", "ModelVittsEs"),
+        "importer": "EpubImporter",
+        "exporter_opts": {"lang": "es", "log": True},
+    }
+
+    scriptum = Scriptorium()
+    scriptum.setup(opts)
+    scriptum.load_data()
+    scriptum.transmute()
+    scriptum.export()
+
+    assert expected1.exists()
+    assert expected2.exists()
+    assert expected1.is_file()
+    assert expected2.is_file()
+    assert expected1.stat().st_size > 0
+    assert expected2.stat().st_size > 0
 
 
 # @pytest.mark.skip(reason="Slow execution")
