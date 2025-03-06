@@ -67,9 +67,9 @@ class EpubImporter:
 
             section_metadata = Section(
                 content=content,
-                title=self.get_section_title(content),
+                title=self.get_section_title(content) or filepath.stem,
                 filepath=self.get_section_inzip_path(filepath),
-                lang=self.get_section_lang(content),
+                lang=self.get_section_lang(content) or metadata.lang,
                 order=order,
                 text=content.get_text(separator="\n"),
             )
@@ -88,15 +88,35 @@ class EpubImporter:
         return lang
 
     def get_section_title(self, content: BeautifulSoup) -> str:
-        title = content.get("title")
+        title = content.get("title", "")
+
         if not title:
             title_tag = content.find("title")
-            title = title_tag.get_text() if title_tag else title
+            title = title_tag.get_text() if title_tag else ""
+
         if not title:
-            try:
-                title = content.html.body.find("h1").get_text()
-            except Exception:
-                title = "NONE"
+            for i in range(1, 7):
+                try:
+                    htag = content.html.body.find(f"h{i}")
+                    title = htag.get_text() or htag.get("title") or ""
+                    if title:
+                        return title
+                except Exception:
+                    title = ""
+
+        if not title:
+            og_title = content.find("meta", attrs={"property": "og:title"})
+            title = og_title.get("content") if og_title else ""
+
+        # if not title:
+        #     first_three_paragraphs = content.find_all("p")[:3]
+        #     paragraph = " ".join(p.get_text() for p in first_three_paragraphs)
+        #     title = " ".join(paragraph.split()[:3]) or ""
+
+        # if not title:
+        #     beginning = content.get_text().split()[:3]
+        #     title = " ".join(beginning)
+
         return title
 
     def parse_document_metadata(self) -> DocumentMetadata:
