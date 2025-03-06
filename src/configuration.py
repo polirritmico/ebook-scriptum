@@ -25,16 +25,17 @@ class ScriptoriumConfiguration:
     }
 
     def __init__(self) -> None:
-        self.importer: ImporterHandler | None = None
         self.exporter: ExporterHandler | None = None
+        self.exporter_opts: dict | None = None
+        self.importer: ImporterHandler | None = None
+        self.importer_opts: dict | None = None
         self.input_file: list[Path] | None = None
         self.output: Path | None = None
         self.raw_opts: dict | None = None
+        self.selected_sections: list[Path] | None = None
         self.transmuter: list[TransmuterHandler] | None = None
-        self.transmuter_type: TransmuterWithModel | None = None
-        self.importer_opts: dict | None = None
         self.transmuter_opts: dict | None = None
-        self.exporter_opts: dict | None = None
+        self.transmuter_type: TransmuterWithModel | None = None
 
         self.collector = Collector()
 
@@ -101,6 +102,10 @@ class ScriptoriumConfiguration:
         transmuter_opts = opts.get("transmuter_opts")
         if transmuter_opts:
             self.transmuter_opts = transmuter_opts
+
+        selected_sections = opts.get("selection")
+        if selected_sections:
+            self.selected_sections = [Path(section) for section in selected_sections]
 
     def parse_handlers(self, opts: dict) -> None:
         if not self.importer:
@@ -216,4 +221,10 @@ class ScriptoriumConfiguration:
         return self.importer_opts
 
     def get_transmuter_opts(self) -> dict | None:
+        # TODO: Review this approach, maybe do it in the parse function
+        if self.exporter is None and self.exporter_opts:
+            return (self.transmuter_opts or {}) | self.exporter_opts
         return self.transmuter_opts
+
+    def get_selected_sections(self) -> dict | None:
+        return self.selected_sections
