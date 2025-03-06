@@ -18,13 +18,16 @@ class DummyTransmuter:
         return
 
     def set_exporter(self, exporter: ExporterHandler) -> None:
-        return
+        self.exporter: ExporterHandler = exporter
 
     def transmute(self, document: Document) -> None:
-        return
+        self.document = document
 
     def export(self, path: Path) -> None:
-        return
+        if not hasattr(self, "document"):
+            raise ValueError("Mising document. Use transmute")
+        elif hasattr(self, "exporter"):
+            self.exporter.export(self.document, path)
 
     def generic_response_validator(self, foo, bar) -> bool:
         return True
