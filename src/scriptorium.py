@@ -13,13 +13,13 @@ class Scriptorium:
     DEFAULT_OUTPUT_PATH: str = "output"
 
     def __init__(self):
-        self.importer: ImporterHandler | None = None
-        self.exporter: ExporterHandler | None = None
-        self.transmuter: TransmuterHandler | None = None
-        self.options: ScriptoriumConfiguration = ScriptoriumConfiguration()
         self.document: Document | None = None
+        self.exporter: ExporterHandler | None = None
+        self.importer: ImporterHandler | None = None
         self.input_files: list[Path] | None = None
+        self.options: ScriptoriumConfiguration = ScriptoriumConfiguration()
         self.output: Path | None = None
+        self.transmuter: TransmuterHandler | None = None
 
     def setup(self, opts: dict | str | Path = None) -> None:
         self.options.setup(opts)
@@ -63,7 +63,8 @@ class Scriptorium:
 
     def transmute(self, document: Document | None = None) -> None:
         document = document if document else self.document
-        self.transmuter.transmute(document)
+        selection = DocumentSectionSelector().select(document, self.options)
+        self.transmuter.transmute(selection)
 
     def export(self, document: Document | None = None) -> Path:
         return self.transmuter.export(self.options.output)
