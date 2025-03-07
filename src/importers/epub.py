@@ -186,7 +186,7 @@ class EpubImporter:
 
         for entry in path.rglob("*"):
             if entry.name == metadata_file:
-                metadata = entry  # TODO: What if more than one file is founded?
+                metadata = entry  # TODO: What if more than one file is found?
             elif entry.suffix in text_suffixes:
                 text_files.append(entry)
 

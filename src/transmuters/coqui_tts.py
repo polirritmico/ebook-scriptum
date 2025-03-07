@@ -82,8 +82,7 @@ class CoquiTTS:
         return
 
     def transmute(self, document: Document) -> None:
-        processed_document = self.process_text(document)
-        self.processed_document = processed_document
+        self.processed_document = self.process_text(document)
 
         self.model.prepare_request(self.opts)
         self.import_libraries()
@@ -106,10 +105,12 @@ class CoquiTTS:
             raise ValueError(f"Output path is not a dir: '{output_dir}'")
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        for name, section in self.processed_document.items():
+        for file, section in self.processed_document.items():
             if not section:
                 continue
-            name = Path(name).with_suffix(".wav")
+            if not isinstance(file, Path):
+                file = Path(file)
+            name = file.with_name(file.name + ".wav")
             audio_file = output_dir / name
             self.tts.tts_to_file(**self.tts_opts, text=section, file_path=audio_file)
 
@@ -134,6 +135,7 @@ class CoquiTTS:
             if store_log:
                 opts["log_section_name"] = section_name
             processed_text = text_processor(section_txt, self.word_dict, opts)
-            processed_document[section.title] = processed_text
+            output_name = f"{section.order:02}. {section.title}"
+            processed_document[output_name] = processed_text
 
         return processed_document
