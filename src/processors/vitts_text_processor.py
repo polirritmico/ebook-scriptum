@@ -70,7 +70,8 @@ class VittsTextProcessor:
         for line_number, line in enumerate(text):
             if prev_line:
                 # TODO: Check the impact of this:
-                prev_line.replace(".", ",")
+                prev_line = prev_line.replace(".", " .")
+                # prev_line = prev_line.replace(".", ",")
 
                 line = prev_line + " " + line
                 text[line_number] = line
