@@ -27,10 +27,12 @@ class DocumentSectionSelector:
             choice = f"{section.order:02}. {section.title}"  # {section.filepath.name}"
             section_choices[choice] = section.filepath
 
+        choices = list(section_choices.keys())
         sections_selector_checkbox = inquirer.Checkbox(
             "sections",
             message="Select document sections to transmute",
-            choices=list(section_choices.keys()),
+            choices=choices,
+            defaults=choices,
         )
         user_selection = inquirer.prompt([sections_selector_checkbox]).get("sections")
 
