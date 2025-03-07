@@ -60,7 +60,7 @@ class VittsTextProcessor:
         target.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file = target / f"{name.stem}_{timestamp}{name.suffix}"
+        file = target / f"{name.stem}_{timestamp}.txt"
 
         file.write_text(text, encoding="utf-8")
 
