@@ -32,7 +32,7 @@ class DocumentSectionSelector:
             "sections",
             message="Select document sections to transmute",
             choices=choices,
-            defaults=choices,
+            default=choices,
         )
         user_selection = inquirer.prompt([sections_selector_checkbox]).get("sections")
 
