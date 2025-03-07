@@ -68,16 +68,18 @@ class VittsTextProcessor:
         prev_line: str | None = None
         lines_to_remove = []
         for line_number, line in enumerate(text):
+            line_width = len(line)
+            if line_width <= min_width:
+                line = line.replace(".", " .")  # maybe "," instead " ."
+
             if prev_line:
                 line = prev_line + " " + line
                 text[line_number] = line
                 prev_line = None
 
             line_width = len(line)
-            if line_width <= min_width:
-                # TODO: Check the impact of this:
-                prev_line = line.replace(".", " .")
-                # prev_line = prev_line.replace(".", ",")
+            if line_width <= min_width + 1:
+                prev_line = line
                 lines_to_remove.append(line_number)
 
         if prev_line:
