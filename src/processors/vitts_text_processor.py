@@ -56,14 +56,11 @@ class VittsTextProcessor:
         line = re.sub(pattern, lambda char: char.group(1).upper(), line, 1)
         return line
 
-    def store_generated_text(self, text: str, source_name: str = "") -> None:
-        target_path = Path(self.LOG_DIR)
-        target_path.mkdir(parents=True, exist_ok=True)
+    def store_generated_text(self, text: str, name: Path, target: Path) -> None:
+        target.mkdir(parents=True, exist_ok=True)
 
-        if source_name:
-            source_name = "_" + source_name
-        basename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file = target_path / f"{source_name}{basename}.txt"
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file = target / f"{name.stem}_{timestamp}{name.suffix}"
 
         file.write_text(text, encoding="utf-8")
 
@@ -127,11 +124,11 @@ class VittsTextProcessor:
         self.join_short_lines(processed, min_width=20)
         multiline_text = "\n\n".join(processed)
 
-        log = opts.get("log")
-        if log:
-            if not isinstance(log, str | Path):
-                log = self.LOG_DIR
-            source_filename = opts.get("filename")
-            self.store_generated_text(multiline_text, source_filename)
+        log_path = opts.get("log")
+        if log_path:
+            if not isinstance(log_path, Path):
+                raise TypeError("Log setting is not of 'Path' type")
+            source_file = Path(opts.get("log_section_name"))
+            self.store_generated_text(multiline_text, source_file, log_path)
 
         return multiline_text

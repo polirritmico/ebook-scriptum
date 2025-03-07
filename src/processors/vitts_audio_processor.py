@@ -91,7 +91,7 @@ class VittsAudioProcessor:
     def make_temp_filename(self, original_filename: str) -> str:
         original_filename = re.sub(r"_temp\d+", "", original_filename)
         tmp_idx = len(self.tmp_register) + 1
-        tmp_filename = f"{original_filename[:-4]}_temp{tmp_idx}.wav"
+        tmp_filename = f"{original_filename[:-4]}_temp{tmp_idx}.wav"  # .wav = 4 chars
         self.tmp_register.append(Path(tmp_filename))
         return tmp_filename
 
