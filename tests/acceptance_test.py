@@ -23,6 +23,7 @@ def tmp_dir():
 @pytest.mark.filterwarnings("ignore::UserWarning")
 def test_audio_processor(tmp_dir):
     case = ["TOC.xhtml", "Section0001.xhtml"]
+    log_file = tmp_dir / "logs"
     expected1 = tmp_dir / "Chapter 1.mp3"
     expected2 = tmp_dir / "Índice de contenido.mp3"
 
@@ -32,7 +33,7 @@ def test_audio_processor(tmp_dir):
         "selection": case,
         "transmuter": ("CoquiTTS", "ModelVittsEs"),
         "importer": "EpubImporter",
-        "exporter_opts": {"lang": "es", "log": True},
+        "exporter_opts": {"lang": "es", "log": log_file},
     }
 
     scriptum = Scriptorium()
@@ -66,7 +67,7 @@ def test_tts_ebook_to_wav(tmp_dir) -> None:
         "importer": "EpubImporter",
         "exporter_opts": {
             "lang": "es",
-            "log": "tests/files/outputs/tts_test/log",
+            "log": tmp_dir / "logs",
             "keep_wav": True,
             "word_dict": word_dict,
         },
