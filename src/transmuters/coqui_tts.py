@@ -63,6 +63,7 @@ class CoquiTTS:
         self.text_processor_opts = opts.get("text_processor_opts", {})
         self.text_processor_opts["log"] = opts.get("log")
         self.text_processor_opts["keep_wav"] = opts.get("keep_wav")
+        self.text_processor_opts["lang"] = opts.get("lang")
 
     def set_model(self, model: ModelHandler) -> None:
         if model and model.transmuter_type != self.transmuter_type:
