@@ -70,7 +70,9 @@ class VittsTextProcessor:
         for line_number, line in enumerate(text):
             line_width = len(line)
             if line_width <= min_width:
-                line = line.replace(".", " .")  # maybe "," instead " ."
+                # INFO: Tested with "space-period", "comma", "space-comma".
+                # "space-comma" produces the best results by far.
+                line = line.replace(".", " ,")
 
             if prev_line:
                 line = prev_line + " " + line
