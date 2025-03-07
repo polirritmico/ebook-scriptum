@@ -18,9 +18,11 @@ class CoquiTTS:
     def __init__(self):
         self.device = "cuda"
         self.exporter = None
+        self.keep_wav = None
         self.model = None
         self.opts = {}
         self.processor = None
+        self.text_processor_opts = {}
         self.tts = None
         self.tts_opts = {}
         self.word_dict: dict[str, str] = {}
@@ -49,20 +51,18 @@ class CoquiTTS:
     def set_options(self, opts: dict) -> None:
         if not isinstance(opts, dict):
             raise TypeError("CoquiTTS bad options type")
-        self.opts = opts
-        self.set_export_options(opts)
+        self.opts = opts.get("exporter_opts", opts)
+        self.set_export_options(self.opts)
 
     def set_export_options(self, opts: dict) -> None:
         word_dict = opts.get("word_dict")
         if word_dict:
             self.word_dict = word_dict
 
-        tts_opts = opts.get("exporter_opts")
-        if not tts_opts:
-            return
-        self.tts_opts = tts_opts
-        # FIX: model vocoder_name is set in prepare_requires not at this stage
-        # self.tts_opts["vocoder_name"] = self.model.vocoder
+        self.tts_opts = opts.get("tts_opts", {})
+        self.text_processor_opts = opts.get("text_processor_opts", {})
+        self.text_processor_opts["log"] = opts.get("log")
+        self.text_processor_opts["keep_wav"] = opts.get("keep_wav")
 
     def set_model(self, model: ModelHandler) -> None:
         if model and model.transmuter_type != self.transmuter_type:
@@ -124,11 +124,14 @@ class CoquiTTS:
 
     def process_text(self, document: Document) -> dict[Path, str]:
         processed_document: dict[Path, str] = {}
-        opts = self.opts.get("text_processor_opts") or self.model.text_processor_opts
+        opts = self.text_processor_opts or self.model.text_processor_opts
+        store_log = "log" in opts
 
         text_processor = VittsTextProcessor().process_text
         for section_name, section in document.sections.items():
             section_txt = document.get_content(section_name, True)
+            if store_log:
+                opts["log_section_name"] = section_name
             processed_text = text_processor(section_txt, self.word_dict, opts)
             processed_document[section.title] = processed_text
 
