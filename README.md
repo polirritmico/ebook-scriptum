@@ -1,7 +1,16 @@
-# eBook Scriptum 📚✨
+# eBook Scriptum 📚✨ (WIP)
 
 > _A collection of tools to transform eBooks into audio, translations, and more
 > using IA and other processors_ 🎧🌍
+
+---
+
+<!-- prettier-ignore-start -->
+> [!WARNING]
+> 🚧 Highly experimental 🚧
+>
+> This tool is under heavy development. Expect breaking changes ⚠️.
+<!-- prettier-ignore-end -->
 
 ## Description
 
