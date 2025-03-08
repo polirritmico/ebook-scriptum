@@ -8,13 +8,16 @@
 eBook Scriptum is a versatile modular tool for processing and converting
 text-based documents into various formats. By design, it supports multiple
 optional transformations to the imported documents, such as AI-driven
-translation or text-to-speech audio generation.
+translation or text-to-speech (TTS) audio generation.
 
 eBook Importer uses three interchangeable main components:
 
-- An Importer: Used to import a supported file format into an inner Document.
-- A Transformer: Used to transform the inner Document (e.g., translations, tts).
-- An Exporter: Used to export the inner Document into a supported file format.
+- An `Importer`: Used to import a supported file format into an inner
+  `Document`.
+- A `Transformer`: Used to transform the inner `Document` (e.g., translations,
+  TTS).
+- An `Exporter`: Used to export the inner `Document` into a supported file
+  format.
 
 Multiple transformations can be applied in a single transmutation process, for
 example, translating the eBook and then converting it into translated mp3 audio
@@ -47,7 +50,6 @@ TODO
 ```python
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 
 from src.scriptorium import Scriptorium
 
@@ -87,7 +89,7 @@ Inside `path/to/book/`:
 {
   "input": "path/to/book/ebook.epub",
   "output": "target/path/",
-  "importer": "EbookImporter",
+  "importer": "EpubImporter",
   "exporter": "EpubExporter",
   "transmuter": ["OllamaTranslator", "ModelLlama3_2"],
   "metadata": {
@@ -98,6 +100,8 @@ Inside `path/to/book/`:
 }
 ```
 
+`transmute.py`:
+
 ```python
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -105,7 +109,7 @@ Inside `path/to/book/`:
 import Scriptorium
 
 scriptum = Scriptorium()
-scriptum.setup({"input": "path/to/ebook.epub"})
+scriptum.setup({"input": "ebook.epub"})
 scriptum.load_data()
 scriptum.transmute()
 scriptum.export()
@@ -133,7 +137,7 @@ docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --device=/
 
 TODO
 
-## AMD
+### AMD
 
 To remove annoying Rocm warnings try this:
 
