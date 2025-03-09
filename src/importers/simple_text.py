@@ -99,7 +99,7 @@ class SimpleTextImporter:
             title=self.metadata.title,
             filepath=self.sources,
             lang=self.metadata.lang,
-            order=0,
+            order=1,
             text=self.content,
         )
 
