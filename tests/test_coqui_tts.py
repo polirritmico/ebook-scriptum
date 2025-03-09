@@ -22,8 +22,8 @@ def tmp_dir():
 def test_tts_acceptance(tmp_dir) -> None:
     case_file = Path("tests/files/simple.txt")
     expected_log = tmp_dir / "tts_log"
-    expected1 = tmp_dir / "simple.wav"
-    expected2 = tmp_dir / "simple.mp3"
+    expected1 = tmp_dir / "01. simple.wav"
+    expected2 = tmp_dir / "01. simple.mp3"
     case_opts = {
         "text_processor_opts": {"lang": "es"},
         "keep_wav": True,

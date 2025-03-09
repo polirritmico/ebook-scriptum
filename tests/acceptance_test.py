@@ -24,8 +24,8 @@ def tmp_dir():
 def test_audio_processor(tmp_dir):
     case = ["TOC.xhtml", "Section0001.xhtml"]
     log_file = tmp_dir / "logs"
-    expected1 = tmp_dir / "Chapter 1.mp3"
-    expected2 = tmp_dir / "Índice de contenido.mp3"
+    expected1 = tmp_dir / "02. Chapter 1.mp3"
+    expected2 = tmp_dir / "01. Índice de contenido.mp3"
 
     opts = {
         "input": "tests/files/simple_ebook.epub",
@@ -53,7 +53,7 @@ def test_audio_processor(tmp_dir):
 # @pytest.mark.skip(reason="Slow execution")
 def test_tts_ebook_to_wav(tmp_dir) -> None:
     case = ["Section0001.xhtml"]
-    expected = tmp_dir / "Chapter 1.wav"
+    expected = tmp_dir / "02. Chapter 1.wav"
 
     word_dict = {
         "Chapter": "Capítulo",
