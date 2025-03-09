@@ -6,19 +6,18 @@ from src.scriptorium import Scriptorium
 
 def main():
     opts = {
-        "input": "source_text",  # dir or file
-        "input_handler": "SimpleTextImporter",
-        "transmuter": "OllamaTranslator",
-        "output": "default_output",  # output dir
-        "title": "Archivo de prueba",
-        "creator": "Anónimo",
-        "lang": "es",
+        "input": "source_file",
+        "output": "output_dir",
+        "importer": "SimpleTextImporter",
+        "transmuter": ("OllamaTranslator", ""),
+        "exporter": "EpubExporter",
     }
 
     scriptum = Scriptorium()
     scriptum.setup(opts)
-    scriptum.synthesize_transmutation()
-    scriptum.crystallize()
+    scriptum.load_data()
+    scriptum.transmute()
+    scriptum.export()
 
 
 if __name__ == "__main__":
