@@ -6,13 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
-# from src.dataclass import DocumentMetadata, Section
 from src.document import Document
-
-# from src.configuration import ScriptoriumConfiguration
-
-
-# from bs4 import BeautifulSoup
 
 
 class EpubExporter:
