@@ -21,6 +21,22 @@ def clean_fs() -> None:
         shutil.rmtree(test_fs)
 
 
+def test_parse_toc_file() -> None:
+    case_file = [Path("tests/files/simple_ebook.epub")]
+    expected_entries = [
+        ("Text/cubierta.xhtml", "Cubierta"),
+        ("Text/Section0001.xhtml", "Chapter 1"),
+    ]
+
+    epub = EpubImporter()
+    epub.load_data(case_file)
+    output_toc = epub.parse_toc_file()
+
+    for expected, output in zip(expected_entries, output_toc):
+        assert expected[0] == output[0]
+        assert expected[1] == output[1]
+
+
 def test_epub_importer_handler_protocol_compliance() -> None:
     case_file = [Path("tests/files/simple_ebook.epub")]
 
