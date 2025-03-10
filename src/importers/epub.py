@@ -67,7 +67,7 @@ class EpubImporter:
 
             section_metadata = Section(
                 content=content,
-                title=self.get_section_title(content) or filepath.stem,
+                title=self.get_section_title(filepath, metadata, content),
                 filepath=self.get_section_inzip_path(filepath),
                 lang=self.get_section_lang(content) or metadata.lang,
                 order=order,
@@ -87,7 +87,23 @@ class EpubImporter:
         lang = content.html.get("xml:lang")
         return lang
 
-    def get_section_title(self, content: BeautifulSoup) -> str:
+    def get_section_title(
+        self, filename: Path, metadata: DocumentMetadata, content: BeautifulSoup
+    ) -> str:
+        if metadata.toc:
+            for file, title in metadata.toc:
+                if file != filename:
+                    continue
+
+                if title:
+                    return title
+                else:
+                    break
+
+        title = self.get_section_title_from_content(content)
+        return title or filename.stem
+
+    def get_section_title_from_content(self, content: BeautifulSoup) -> str:
         title = content.get("title", "")
 
         if not title:
