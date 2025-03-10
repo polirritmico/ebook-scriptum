@@ -25,3 +25,4 @@ class DocumentMetadata:
     description: str
     source: Path | None = None
     spine: list[Path] | None = None
+    toc: list[tuple[str, str]] | None = None
