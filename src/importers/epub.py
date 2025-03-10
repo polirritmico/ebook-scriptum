@@ -122,6 +122,8 @@ class EpubImporter:
     def parse_document_metadata(self) -> DocumentMetadata:
         if self.metadata_file_content is None:
             raise ValueError("No metadata_file_content. Try collect_files_data() first")
+        if self.toc_file_content is None:
+            raise ValueError("No toc_file_content. Try collect_files_data()first")
 
         soup = BeautifulSoup(self.metadata_file_content, "xml")
         metadata = DocumentMetadata(
@@ -131,6 +133,7 @@ class EpubImporter:
             description=self.get_text_from_soup_tag("dc:description", soup),
             source=self.sources,
             spine=self.get_sections_in_order_from_soup(soup),
+            toc=self.get_section_names_from_toc_file(self.toc_file_content),
         )
 
         return metadata
@@ -165,6 +168,22 @@ class EpubImporter:
         if tag_element and hasattr(tag_element, "text"):
             return tag_element.get_text()
 
+    def parse_toc_file(self, source: str | None = None) -> tuple[str, str]:
+        source = source or self.toc_file_content
+        if not source:
+            raise ValueError("Not loaded content.opf. Try load_document()")
+
+        soup = BeautifulSoup(source, "xml")
+        nav_point = soup.find("navMap")
+        text_tags = [tag.text for tag in nav_point.find_all("text")]
+        content_tags = [tag.get("src") for tag in nav_point.find_all("content")]
+
+        toc = []
+        for filename, title in zip(content_tags, text_tags):
+            entry = (filename, title)
+            toc.append(entry)
+        return toc
+
     def collect_files_data(self) -> None:
         if self.metadata_file is None or self.text_files is None:
             raise ValueError("Not collected files. Try load_data() first.")
@@ -179,19 +198,31 @@ class EpubImporter:
             raw_data = stream.read()
             self.metadata_file_content = raw_data
 
+        with open(self.toc_file, "r", encoding="utf-8") as stream:
+            raw_data = stream.read()
+            self.toc_file_content = raw_data
+
     def collect_metadata_and_text_files(self, path: Path) -> (list[str], str):
-        text_files, metadata = [], []
+        text_files = []
         metadata_file = "content.opf"
+        toc_file = "toc.ncx"
         text_suffixes = {".xhtml", ".html"}
 
         for entry in path.rglob("*"):
             if entry.name == metadata_file:
                 metadata = entry  # TODO: What if more than one file is found?
+            elif entry.name == toc_file:
+                toc = entry
             elif entry.suffix in text_suffixes:
                 text_files.append(entry)
 
+        # TODO: All epubs have metadata and toc files?
+        assert metadata, "Missing content.opf"
+        assert toc, "Missing toc.ncx"
+
         self.text_files = text_files
         self.metadata_file = metadata
+        self.toc_file = toc
         return text_files, metadata
 
     def extract_epub(self, source: Path, target_path: Path) -> None:
