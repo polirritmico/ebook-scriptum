@@ -168,7 +168,9 @@ class EpubImporter:
         if tag_element and hasattr(tag_element, "text"):
             return tag_element.get_text()
 
-    def parse_toc_file(self, source: str | None = None) -> tuple[str, str]:
+    def get_section_names_from_toc_file(
+        self, source: str | None = None
+    ) -> tuple[str, str]:
         source = source or self.toc_file_content
         if not source:
             raise ValueError("Not loaded content.opf. Try load_document()")

@@ -30,7 +30,7 @@ def test_parse_toc_file() -> None:
 
     epub = EpubImporter()
     epub.load_data(case_file)
-    output_toc = epub.parse_toc_file()
+    output_toc = epub.get_section_names_from_toc_file()
 
     for expected, output in zip(expected_entries, output_toc):
         assert expected[0] == output[0]
