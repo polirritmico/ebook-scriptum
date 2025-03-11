@@ -124,15 +124,6 @@ class EpubImporter:
             og_title = content.find("meta", attrs={"property": "og:title"})
             title = og_title.get("content") if og_title else ""
 
-        # if not title:
-        #     first_three_paragraphs = content.find_all("p")[:3]
-        #     paragraph = " ".join(p.get_text() for p in first_three_paragraphs)
-        #     title = " ".join(paragraph.split()[:3]) or ""
-
-        # if not title:
-        #     beginning = content.get_text().split()[:3]
-        #     title = " ".join(beginning)
-
         return title
 
     def parse_document_metadata(self) -> DocumentMetadata:
