@@ -22,6 +22,9 @@ class DocumentSectionSelector:
         except Exception:
             raise ImportError("Failed import: inquirer")
 
+        preselect_question = inquirer.Confirm("sel", message="Preselect all sections?")
+        select_all = inquirer.prompt([preselect_question]).get("sel")
+
         section_choices: dict[str, str] = {}
         for section in document.sections.values():
             choice = f"{section.order:02}. {section.title}"  # {section.filepath.name}"
@@ -32,7 +35,7 @@ class DocumentSectionSelector:
             "sections",
             message="Select document sections to transmute",
             choices=choices,
-            default=choices,
+            default=choices if select_all else [],
         )
         user_selection = inquirer.prompt([sections_selector_checkbox]).get("sections")
 
