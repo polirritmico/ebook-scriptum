@@ -92,7 +92,7 @@ class EpubImporter:
     ) -> str:
         if metadata.toc:
             for file, title in metadata.toc:
-                if file != filename:
+                if filename.name not in file:
                     continue
 
                 if title:
