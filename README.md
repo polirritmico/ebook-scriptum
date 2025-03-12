@@ -1,7 +1,7 @@
 # eBook Scriptum 📚✨ (WIP)
 
 > _A collection of tools to transform eBooks into audio, translations, and more
-> using IA and other processors_ 🎧🌍
+> using AI and other processors_ 🎧🌍
 
 ---
 
@@ -19,7 +19,7 @@ text-based documents into various formats. By design, it supports multiple
 optional transformations to the imported documents, such as AI-driven
 translation or text-to-speech (TTS) audio generation.
 
-eBook Importer uses three interchangeable main components:
+eBook Scriptum uses three interchangeable main components:
 
 - An `Importer`: Used to import a supported file format into an inner
   `Document`.
