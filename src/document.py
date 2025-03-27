@@ -25,7 +25,7 @@ class Document:
             raise KeyError(f"Missing section from the document: {section_name}")
 
         if raw:
-            return section.content.get_text()
+            return section.content.get_text("\n")
         else:
             return section.content.prettify()
 

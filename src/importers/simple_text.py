@@ -114,13 +114,22 @@ class SimpleTextImporter:
         html.append(body)
 
         # TODO: Add support for multiple content files
-        content = self.content[0].split("\n")
+        content = self.content[0].splitlines() + [""]
+
+        paragraphs = []
+        partial_paragraph = []
         for raw_line in content:
             line = raw_line.strip()
             if line:
-                p = soup.new_tag("p")
-                p.string = line
-                body.append(p)
+                partial_paragraph.append(line)
+            elif partial_paragraph:
+                paragraphs.append(" ".join(partial_paragraph))
+                partial_paragraph = []
+
+        for paragraph in paragraphs:
+            p = soup.new_tag("p")
+            p.string = paragraph
+            body.append(p)
 
         return soup
 
