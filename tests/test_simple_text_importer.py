@@ -6,6 +6,20 @@ from pathlib import Path
 from src.importers.simple_text import SimpleTextImporter
 
 
+def test_paragraph_separation() -> None:
+    filename = "simple_text_paragraph.txt"
+    case = Path("tests/files/") / filename
+    expected = "Title\nThis is a paragraph.\nThis is another paragraph."
+    get_raw_text_instead_html = True
+
+    importer = SimpleTextImporter()
+    importer.load_data([case])
+    document = importer.generate_document()
+    output = document.get_content(case, get_raw_text_instead_html)
+
+    assert expected == output
+
+
 def test_read_file() -> None:
     case = Path("tests/files/simple.txt")
     expected = "En un lugar de la Mancha, de cuyo nombre no quiero acordarme"
