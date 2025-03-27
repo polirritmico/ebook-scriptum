@@ -20,7 +20,7 @@ def test_simple_text_export(tmp_dir) -> None:
     expected = "domingo"
     output_file = tmp_dir / "test_simple_text_export.txt"
     case = {
-        "input": "tests/files/simple-translation.txt",
+        "input": "tests/files/simple_translation.txt",
         "output": output_file,
         "selection": ["*"],
         "transmuter": ("OllamaTranslator", ""),
