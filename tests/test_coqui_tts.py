@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from src.importers.simple_text import SimpleTextImporter
+from src.models.vitts_en import ModelVittsEn
 from src.models.vitts_es import ModelVittsEs
 from src.transmuters.coqui_tts import CoquiTTS
 
@@ -15,6 +16,44 @@ from src.transmuters.coqui_tts import CoquiTTS
 def tmp_dir():
     with TemporaryDirectory(dir="tests/files/", prefix="tts-test-") as tmp:
         yield Path(tmp)
+
+
+def test_paragraph_separation() -> None:
+    case = Path("tests/files/simple_text_paragraph.txt")
+    expected = "Title , This is a paragraph ,\n\nThis is another paragraph."
+
+    importer = SimpleTextImporter()
+    importer.load_data([case])
+    document = importer.generate_document()
+
+    tts = CoquiTTS()
+    tts.set_model(ModelVittsEn())
+    tts.set_options({})
+    output = tts.process_text(document)
+
+    output_file = next(iter(output))
+    assert expected == output[output_file]
+
+
+def test_text_processor(tmp_dir) -> None:
+    case_file = Path("tests/files/text_processor.txt")
+    case_opts = {
+        "exporter_opts": {
+            "log": tmp_dir,
+            "lang": "es",
+        },
+    }
+
+    text = SimpleTextImporter()
+    text.load_data(case_file)
+    document = text.generate_document()
+
+    tts = CoquiTTS()
+    model = ModelVittsEs()
+    tts.set_model(model)
+    tts.set_options(case_opts)
+    tts.transmute(document)
+    tts.export(tmp_dir)
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
