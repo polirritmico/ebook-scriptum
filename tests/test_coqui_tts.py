@@ -35,25 +35,24 @@ def test_paragraph_separation() -> None:
     assert expected == output[output_file]
 
 
-def test_text_processor(tmp_dir) -> None:
+def test_text_processor_log(tmp_dir) -> None:
     case_file = Path("tests/files/text_processor.txt")
-    case_opts = {
-        "exporter_opts": {
-            "log": tmp_dir,
-            "lang": "es",
-        },
-    }
+    case_opts = {"exporter_opts": {"log": tmp_dir, "lang": "es"}}
+    expected = "Cuarenta y uno SILO diecisiete."
 
     text = SimpleTextImporter()
     text.load_data(case_file)
     document = text.generate_document()
 
     tts = CoquiTTS()
-    model = ModelVittsEs()
-    tts.set_model(model)
+    tts.set_model(ModelVittsEs())
     tts.set_options(case_opts)
     tts.transmute(document)
-    tts.export(tmp_dir)
+
+    log_file = next(tmp_dir.glob("*.txt"))
+    assert log_file.exists()
+    output = log_file.read_text().splitlines()[0]
+    assert expected == output
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
