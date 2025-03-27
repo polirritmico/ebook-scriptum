@@ -127,8 +127,9 @@ class VittsTextProcessor:
         self.join_short_lines(processed, min_width=20)
         multiline_text = "\n\n".join(processed)
 
-        log_path = Path(opts.get("log"))
-        if log_path:
+        opts_log = opts.get("log")
+        if opts_log:
+            log_path = Path(opts_log)
             if not isinstance(log_path, Path):
                 raise TypeError("Log setting is not of 'Path' type")
             source_file = Path(opts.get("log_section_name"))
