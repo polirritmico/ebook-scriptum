@@ -21,7 +21,10 @@ class VittsTextProcessor:
         "?": '?"',
         "¡": '"',
         "!": '!"',
-        ":": ".",  # : corrompe las frases
+        "’": "'",
+        "“": '"',
+        "”": '"',
+        ":": ".",  # the : character breaks the output
     }
 
     def replace_unhandled_symbols(self, line: str) -> str:
