@@ -10,6 +10,8 @@ from src.document import Document
 
 class DocumentSectionSelector:
     def select(self, document: Document, opts: ScriptoriumConfiguration) -> Document:
+        if len(document.sections) == 1:
+            return document
         preselection = opts.get_selected_sections()
         if preselection:
             return self.resolve_selection(document, preselection)
